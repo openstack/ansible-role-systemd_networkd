@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+{% for key, values in item.1.items() %}
+[{{ key }}]
+{%   for k, v in values.items() %}
+{{ k }}={{ v }}
+{%   endfor %}
+
+{% endfor %}

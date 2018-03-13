@@ -1,0 +1,103 @@
+---
+# Copyright 2017, Rackspace US, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Cleanup all known network interfaces
+systemd_interface_cleanup: false
+
+# Enable systemd-networkd and (re)start the service
+systemd_run_networkd: false
+
+# The `systemd_link_config_overrides` option can be used on the default link.
+#  See the following link for all available options:
+#   https://www.freedesktop.org/software/systemd/man/systemd.link.html
+# systemd_default_unit:
+#   Match:
+#     Driver=things other thing
+systemd_link_config_overrides: {}
+
+# All items listed in the `systemd_netdevs` array are craeted using the exact
+# networkd syntax found here:
+#   https://www.freedesktop.org/software/systemd/man/systemd.netdev.html
+# At an absolute minimum, the items must have "NetDev" and "Name" defined.
+# Items generated will have an integer assigned to them so that they're loaded
+# in the order specified.
+
+# systemd_netdevs:
+#   - NetDev:
+#       Name: dummy0
+#       Kind: dummy
+#   - NetDev:
+#       Name: dummy1
+#       Kind: dummy
+#   - NetDev:
+#       Name: bond0
+#       Kind: bond
+#     Bond:
+#       Mode: 802.3ad
+#       TransmitHashPolicy: layer3+4
+#       MIIMonitorSec: 1s
+#       LACPTransmitRate: fast
+#   - NetDev:
+#       Name: br-dummy
+#       Kind: bridge
+
+systemd_netdevs: []
+
+# The systemd networkd dictionary is a set of networks that will be created.
+# items generated will have an integer assigned to them so that they're loaded
+# in the order specified. The dictionary can contain the following options:
+#  `config_overrides` -- (optional) used to inject extra configuration options
+#                                   into the network file. A full list of all
+#                                   options can be found here:
+#                                   https://www.freedesktop.org/software/systemd/man/systemd.network.html
+#  `interface` -- (required) Name of interface to match
+#  `address` -- (option) IP address the interface should be given. To make this
+#                        interface use DHCP set this string to "dhcp"
+#  `netmask` -- (optional) Netmask to use for the interface
+#  `gateway` -- (optional) Gateway to use for the interface
+#  `bridge` -- (optional) Bridge name for a mapped interface
+#  `bond` -- (optional) Bond name for a mapped interface
+#  `vlan` -- (optional) VLAN name for a mapped interface
+#  `macvlan` -- (optional) MACVLAN name for a mapped interface
+#  `vxlan` -- (optional) VXLAN name for a mapped interface
+#  `mtu` -- (optional) MTU to use for the interface
+#  `usedns` -- (optional) When set to true the interface will accept DNS when
+#                         running in dhcp mode
+#  `static_routes` -- (optional) list of routes to use for the network. This
+#                                option requires a gateway and cidr to be set
+#                                within the list item.
+
+# systemd_networks:
+#   - interface: "dummy0"
+#     bridge: "bond0"
+#     mtu: 9000
+#   - interface: "dummy1"
+#     bridge: "bond0"
+#     mtu: 9000
+#   - interface: "bond0"
+#     bridge: "br-dummy"
+#     mtu: 9000
+#   - interface: "br-dummy"
+#     bridge: "br-dummy"
+#     address: "10.0.0.100"
+#     netmask: "255.255.255.0"
+#     gateway: "10.0.0.1"
+#     mtu: 9000
+#     usedns: true
+#     config_overrides:
+#       Network:
+#         ConfigureWithoutCarrier: true
+
+systemd_networks: []
