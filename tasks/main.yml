@@ -32,14 +32,6 @@
   tags:
     - systemd-networkd
 
-- name: Run interface cleanup script
-  command: "/usr/local/bin/interface-cleanup"
-  failed_when: false
-  when:
-    - systemd_interface_cleanup | bool
-  tags:
-    - systemd-networkd
-
 - name: Create systemd-networkd interface cleanup script
   template:
     src: "interface-cleanup.sh.j2"
@@ -47,6 +39,14 @@
     owner: "root"
     group: "root"
     mode: "0750"
+  when:
+    - systemd_interface_cleanup | bool
+  tags:
+    - systemd-networkd
+
+- name: Run interface cleanup script
+  command: "/usr/local/bin/interface-cleanup"
+  failed_when: false
   when:
     - systemd_interface_cleanup | bool
   tags:
