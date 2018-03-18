@@ -17,16 +17,30 @@ Gateway={{ route['gateway'] }}
 Metric={{ 20 + loop.index }}
 
 {% endfor %}
+
+{%- if item.1.address is not defined %}
+{#   Address is not defined #}
+{%   set _addresses = [] %}
+{% elif item.1.address is iterable and not string %}
+{#   Address is a list, multiple addresses defined #}
+{%   set _addresses = item.1.address %}
+{% else %}
+{#   Single address defined #}
+{%   set _addresses = [item.1] %}
+{% endif %}
+
 [Network]
-{% if item.1.address is defined %}
-{%   set addr_cidr = (item.1.address | string + '/' + item.1.netmask | string) | ipaddr('prefix') %}
-Address={{ item.1.address }}/{{ addr_cidr }}
-{% elif item.1.address is defined and (item.1.address | lower) == 'dhcp' %}
+{% for _addr in _addresses %}
+{%   if _addr.address == 'dhcp' %}
 DHCP=yes
-{% endif %}
-{% if item.1.address is defined and item.1.gateway is defined %}
+{%   else %}
+{%   set _addr_cidr = (item.1.address | string + '/' + item.1.netmask | default('') | string).rstrip('/') | ipaddr('host/prefix') %}
+Address={{ _addr_cidr }}
+{%   endif %}
+{%   if _addr.gateway is defined %}
 Gateway={{ item.1.gateway }}
-{% endif %}
+{%   endif %}
+{% endfor %}
 {% if item.1.bridge is defined %}
 Bridge={{ item.1.bridge }}
 {% elif item.1.bond is defined %}
