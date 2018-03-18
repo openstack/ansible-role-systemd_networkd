@@ -31,6 +31,9 @@ Metric={{ 20 + loop.index }}
 
 [Network]
 {% for _addr in _addresses %}
+{%   if _addr is string %}
+{%       set _addr = {'address': _addr} %}
+{%   endif %}
 {%   if _addr.address == 'dhcp' %}
 DHCP=yes
 {%   else %}
