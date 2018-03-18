@@ -3,11 +3,7 @@
 [Match]
 Name={{ item.1.interface }}
 
-{% if item.1.address is defined %}
-[Address]
-{%   set addr_cidr = (item.1.address | string + '/' + item.1.netmask | string) | ipaddr('prefix') %}
-Address={{ item.1.address }}/{{ addr_cidr }}
-{% elif item.1.address is defined and (item.1.address | lower) == 'dhcp' %}
+{% if item.1.address is defined and (item.1.address | lower) == 'dhcp' %}
 [DHCP]
 UseDNS={{ (item.1.usedns | default(false) | bool) | ternary('yes', 'no') }}
 UseNTP=yes
