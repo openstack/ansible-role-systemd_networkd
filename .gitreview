@@ -1,4 +1,4 @@
 [gerrit]
 host=review.openstack.org
 port=29418
-project=openstack/ansible-systemd_init.git
+project=openstack/ansible-role-systemd_networkd.git
