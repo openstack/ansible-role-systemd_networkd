@@ -21,7 +21,7 @@ Metric={{ 20 + loop.index }}
 {%- if item.1.address is not defined %}
 {#   Address is not defined #}
 {%   set _addresses = [] %}
-{% elif item.1.address is iterable and not string %}
+{% elif item.1.address is iterable and item.1.address is not string %}
 {#   Address is a list, multiple addresses defined #}
 {%   set _addresses = item.1.address %}
 {% else %}
@@ -37,7 +37,7 @@ Metric={{ 20 + loop.index }}
 {%   if _addr.address == 'dhcp' %}
 DHCP=yes
 {%   else %}
-{%   set _addr_cidr = (item.1.address | string + '/' + item.1.netmask | default('') | string).rstrip('/') | ipaddr('host/prefix') %}
+{%   set _addr_cidr = (_addr.address ~ '/' ~ _addr.netmask | default('')).rstrip('/') | ipaddr('host') %}
 Address={{ _addr_cidr }}
 {%   endif %}
 {%   if _addr.gateway is defined %}
