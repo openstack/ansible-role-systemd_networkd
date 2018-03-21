@@ -29,6 +29,8 @@
     mode: "0644"
     config_overrides: "{{ systemd_link_config_overrides }}"
     config_type: "ini"
+  notify:
+    - Restart systemd-networkd
   tags:
     - systemd-networkd
 
@@ -60,6 +62,8 @@
     group: "root"
     mode: "0644"
   with_indexed_items: "{{ systemd_netdevs }}"
+  notify:
+    - Restart systemd-networkd
   tags:
     - systemd-networkd
 
@@ -73,14 +77,16 @@
     config_overrides: "{{ item.1.config_overrides | default({}) }}"
     config_type: "ini"
   with_indexed_items: "{{ systemd_networks }}"
+  notify:
+    - Restart systemd-networkd
   tags:
     - systemd-networkd
 
-- name: Restart systemd-networkd
+- name: Set systemd-networkd service state
   systemd:
     name: "systemd-networkd"
     daemon_reload: yes
     enabled: "{{ (systemd_run_networkd | bool) | ternary('yes', 'no') }}"
-    state: "{{ (systemd_run_networkd | bool) | ternary('restarted', omit) }}"
+    state: "{{ (systemd_run_networkd | bool) | ternary('started', 'stopped') }}"
   tags:
     - systemd-networkd
