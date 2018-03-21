@@ -19,6 +19,10 @@ systemd_interface_cleanup: false
 # Enable systemd-networkd and (re)start the service
 systemd_run_networkd: false
 
+# Default filename formatting
+systemd_networkd_netdev_filename: "{{ item.0 }}-{{ item.1.NetDev.Name }}.netdev"
+systemd_networkd_network_filename: "{{ item.0 }}-{{ item.1.interface }}.network"
+
 # The `systemd_link_config_overrides` option can be used on the default link.
 #  See the following link for all available options:
 #   https://www.freedesktop.org/software/systemd/man/systemd.link.html
@@ -41,6 +45,7 @@ systemd_link_config_overrides: {}
 #   - NetDev:
 #       Name: dummy1
 #       Kind: dummy
+#     filename: "{{ item.1.NetDev.Name }}.netdev"
 #   - NetDev:
 #       Name: bond0
 #       Kind: bond
@@ -84,6 +89,7 @@ systemd_netdevs: []
 #     bridge: "bond0"
 #     mtu: 9000
 #   - interface: "dummy1"
+#     filename: "{{ item.1.interface }}.network"
 #     bridge: "bond0"
 #     mtu: 9000
 #   - interface: "bond0"
