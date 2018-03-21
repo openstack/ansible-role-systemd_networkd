@@ -13,6 +13,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Gather variables for each operating system
+  include_vars: "{{ item }}"
+  with_first_found:
+    - files:
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
+        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
+        - "{{ ansible_distribution | lower }}.yml"
+        - "{{ ansible_os_family | lower }}.yml"
+      skip: true
+  tags:
+    - always
+
+- name: Install networkd distro packages
+  package:
+    name: "{{ systemd_networkd_distro_packages }}"
+    state: "present"
+    update_cache: "{{ (ansible_pkg_mgr == 'apt') | ternary('yes', omit) }}"
+    cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(600, omit) }}"
+  when:
+    - systemd_networkd_distro_packages | length > 0
+  register: install_packages
+  until: install_packages|success
+  retries: 3
+  delay: 2
+
 - name: Create systemd-networkd directory
   file:
     path: "/etc/systemd/network"

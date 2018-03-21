@@ -1,5 +1,6 @@
 ---
 # Copyright 2018, Rackspace US, Inc.
+# Copyright 2018, Logan Vig <logan2211@gmail.com>
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +14,89 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- hosts: localhost
+- name: Playbook for role testing
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+  roles:
+    - role: "systemd_networkd"
+  post_tasks:
+    # Pause for 5 minutes to build app cache.
+    - name: Allow networkd to spin up
+      pause:
+        seconds: 15
+  vars:
+    systemd_networkd_distro_packages:
+      yum:
+        - systemd-networkd
+    systemd_run_networkd: yes
+    systemd_netdevs:
+      - NetDev:
+          Name: dummy0
+          Kind: dummy
+      - NetDev:
+          Name: dummy1
+          Kind: dummy
+      - NetDev:
+          Name: bond0
+          Kind: bond
+        Bond:
+          Mode: 802.3ad
+          TransmitHashPolicy: layer3+4
+          MIIMonitorSec: 1s
+          LACPTransmitRate: fast
+      - NetDev:
+          Name: br-dummy
+          Kind: bridge
+    systemd_networks:
+      - interface: "dummy0"
+        bond: "bond0"
+        mtu: 9000
+      - interface: "dummy1"
+        bond: "bond0"
+        mtu: 9000
+      - interface: "bond0"
+        bridge: "br-dummy"
+        mtu: 9000
+      - interface: "br-dummy"
+        address: "10.0.0.100"
+        netmask: "255.255.255.0"
+        gateway: "10.0.0.1"
+        mtu: 9000
+        usedns: true
+        static_routes:
+          - gateway: "10.1.0.1"
+            cidr: "10.1.0.0/24"
+        config_overrides:
+          Network:
+            ConfigureWithoutCarrier: true
+
+- name: Test networkd
+  hosts: localhost
+  connection: local
+  become: true
   gather_facts: true
   tasks:
-    - debug: msg=testing
+    - name: Interface check
+      assert:
+        that:
+          - ansible_dummy0['active'] == true
+          - ansible_dummy0['type'] == 'ether'
+          - ansible_dummy0['mtu'] == 9000
+          - ansible_dummy1['active'] == true
+          - ansible_dummy1['type'] == 'ether'
+          - ansible_dummy1['mtu'] == 9000
+    - name: Bond check
+      assert:
+        that:
+          - ansible_bond0['active'] == true
+          - ansible_bond0['type'] == 'bonding'
+          - ansible_bond0['mtu'] == 9000
+    - name: Bridge check
+      assert:
+        that:
+          - ansible_br_dummy['active'] == true
+          - ansible_br_dummy['type'] == 'bridge'
+          - ansible_br_dummy['ipv4']['address'] == '10.0.0.100'
+          - ansible_br_dummy['ipv4']['netmask'] == '255.255.255.0'
