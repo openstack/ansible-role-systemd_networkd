@@ -22,3 +22,6 @@
     - systemd_run_networkd | bool
   tags:
     - systemd-networkd
+
+- name: Update initramfs
+  command: "{{ systemd_networkd_update_initramfs }}"

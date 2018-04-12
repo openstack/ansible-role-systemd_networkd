@@ -1,5 +1,5 @@
 ---
-# Copyright 2018, Logan Vig <logan2211@gmail.com>
+# Copyright 2018, Rackspace US, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-systemd_networkd_distro_packages:
-  - systemd-networkd
-
-systemd_networkd_update_initramfs: "dracut -f"
+systemd_networkd_update_initramfs: "/usr/sbin/update-initramfs -u"
