@@ -73,6 +73,20 @@
   tags:
     - systemd-networkd
 
+- name: Create systemd-resolved config
+  template:
+    src: "systemd-resolved.conf.j2"
+    dest: "/etc/systemd/resolved.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  when:
+    - systemd_resolved
+  notify:
+    - Restart systemd-resolved
+  tags:
+    - systemd-resolved
+
 - name: Run interface cleanup script
   command: "/usr/local/bin/interface-cleanup"
   failed_when: false

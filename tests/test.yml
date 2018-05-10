@@ -27,10 +27,11 @@
       pause:
         seconds: 15
   vars:
-    systemd_networkd_distro_packages:
-      yum:
-        - systemd-networkd
     systemd_run_networkd: yes
+    systemd_resolved:
+      DNS: "208.67.222.222"
+      FallbackDNS: "8.8.8.8"
+      Cache: yes
     systemd_netdevs:
       - NetDev:
           Name: dummy0

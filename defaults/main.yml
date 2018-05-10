@@ -107,3 +107,15 @@ systemd_netdevs: []
 #         ConfigureWithoutCarrier: true
 
 systemd_networks: []
+
+# The systemd resolved service can be setup using th following configuration.
+# The generator is a Key=Value pair hash and will set whatever directives it's
+# instructed to. For more information on all of the possible configuration see
+# https://www.freedesktop.org/software/systemd/man/resolved.conf.html
+
+# systemd_resolved:
+#   DNS: "10.127.83.1"
+#   FallbackDNS: "208.67.222.222 8.8.8.8"
+#   Cache: yes
+
+systemd_resolved: {}

@@ -15,5 +15,8 @@
 
 systemd_networkd_distro_packages:
   - systemd-networkd
+  - systemd-resolved
+
+systemd_resolved_available: true
 
 systemd_networkd_update_initramfs: "dracut -f"

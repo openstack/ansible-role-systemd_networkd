@@ -13,4 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+systemd_resolved_available: true
+
 systemd_networkd_update_initramfs: "/usr/sbin/update-initramfs -u"
