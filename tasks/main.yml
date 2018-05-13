@@ -123,11 +123,26 @@
   tags:
     - systemd-networkd
 
-- name: Set systemd-networkd service state
+- name: Reload systemd daemon
+  systemd:
+    daemon_reload: yes
+  tags:
+    - systemd-networkd
+
+- name: Enable systemd-networkd
   systemd:
     name: "systemd-networkd"
-    daemon_reload: yes
-    enabled: "{{ (systemd_run_networkd | bool) | ternary('yes', 'no') }}"
-    state: "{{ (systemd_run_networkd | bool) | ternary('started', 'stopped') }}"
+    enabled: "yes"
+  when:
+    - systemd_run_networkd | bool
+  tags:
+    - systemd-networkd
+
+- name: Start systemd daemon
+  systemd:
+    name: "systemd-networkd"
+    state: "started"
+  when:
+    - systemd_run_networkd | bool
   tags:
     - systemd-networkd
