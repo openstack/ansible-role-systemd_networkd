@@ -15,6 +15,3 @@
 
 ## APT Cache options
 cache_timeout: 600
-
-# Supporting package required to make systemd-networkd function
-systemd_networkd_distro_packages: []

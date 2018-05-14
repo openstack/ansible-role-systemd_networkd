@@ -119,3 +119,24 @@ systemd_networks: []
 #   Cache: yes
 
 systemd_resolved: {}
+
+# Enable or Disable the availability of systemd-resolved. This option is a
+# Boolean variable.
+
+systemd_resolved_available: "{{ _systemd_resolved_available | default(true) }}"
+
+# Specify the command used to update the initramfs. By default this will run
+# "/bin/true" which is done because the command required to run should never
+# be assumed. Distro specific config is available in vars otherwise deployers
+# can set this as needed.
+
+systemd_networkd_update_initramfs: "{{ _systemd_networkd_update_initramfs | default('true') }}"
+
+# Provide a list of packages that are to be installed before this role is
+# executed.
+
+# _systemd_networkd_distro_packages:
+#  - systemd-networkd
+#  - systemd-resolved
+
+systemd_networkd_distro_packages: "{{ _systemd_networkd_distro_packages | default([]) }}"

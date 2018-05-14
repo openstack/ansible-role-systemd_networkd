@@ -13,6 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-systemd_resolved_available: false
+_systemd_resolved_available: false
 
-systemd_networkd_update_initramfs: "dracut -f"
+_systemd_networkd_update_initramfs: "dracut -f"
