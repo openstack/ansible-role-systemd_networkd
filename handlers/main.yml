@@ -16,7 +16,6 @@
 - name: Restart systemd-networkd
   systemd:
     name: "systemd-networkd"
-    daemon_reload: yes
     state: restarted
   when:
     - systemd_run_networkd | bool
@@ -26,7 +25,6 @@
 - name: Restart systemd-resolved
   systemd:
     name: "systemd-resolved"
-    daemon_reload: yes
     state: restarted
   when:
     - systemd_resolved_available | bool

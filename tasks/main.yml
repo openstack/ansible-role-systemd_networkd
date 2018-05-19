@@ -123,26 +123,19 @@
   tags:
     - systemd-networkd
 
-- name: Reload systemd daemon
-  systemd:
-    daemon_reload: yes
-  tags:
-    - systemd-networkd
-
-- name: Enable systemd-networkd
+- name: Enable and start systemd-networkd
   systemd:
     name: "systemd-networkd"
     enabled: "yes"
+    state: started
   when:
     - systemd_run_networkd | bool
   tags:
     - systemd-networkd
 
-- name: Start systemd daemon
-  systemd:
-    name: "systemd-networkd"
-    state: "started"
-  when:
-    - systemd_run_networkd | bool
-  tags:
-    - systemd-networkd
+- name: Force all notified handlers now
+  meta: flush_handlers
+
+- name: (RE)Gather facts post setup
+  setup:
+    gather_subset: "network"
