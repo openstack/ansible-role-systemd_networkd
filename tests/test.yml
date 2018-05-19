@@ -50,6 +50,12 @@
       - NetDev:
           Name: br-dummy
           Kind: bridge
+      - NetDev:
+          Name: dummy2
+          Kind: dummy
+      - NetDev:
+          Name: br-test
+          Kind: bridge
     systemd_networks:
       - interface: "dummy0"
         bond: "bond0"
@@ -72,6 +78,12 @@
         config_overrides:
           Network:
             ConfigureWithoutCarrier: true
+      - interface: "dummy2"
+        bridge: "br-test"
+      - interface: "br-test"
+        address: "10.1.0.1"
+        netmask: "255.255.255.0"
+
 
 - name: Test networkd
   hosts: localhost
@@ -88,6 +100,8 @@
           - ansible_dummy1['active'] == true
           - ansible_dummy1['type'] == 'ether'
           - ansible_dummy1['mtu'] == 9000
+          - ansible_dummy2['active'] == true
+          - ansible_dummy2['type'] == 'ether'
     - name: Bond check
       assert:
         that:
@@ -101,3 +115,49 @@
           - ansible_br_dummy['type'] == 'bridge'
           - ansible_br_dummy['ipv4']['address'] == '10.0.0.100'
           - ansible_br_dummy['ipv4']['netmask'] == '255.255.255.0'
+    - name: Bridge check
+      assert:
+        that:
+          - ansible_br_test['active'] == true
+          - ansible_br_test['type'] == 'bridge'
+          - ansible_br_test['ipv4']['address'] == '10.1.0.1'
+          - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'
+
+
+- name: Playbook for role testing with cleanup
+  hosts: localhost
+  connection: local
+  become: true
+  gather_facts: true
+  roles:
+    - role: "systemd_networkd"
+  post_tasks:
+    - name: Interface check
+      assert:
+        that:
+          - ansible_br_test is defined
+          - ansible_dummy2['active'] == true
+          - ansible_dummy2['type'] == 'ether'
+    - name: Bridge check
+      assert:
+        that:
+          - ansible_br_test['active'] == true
+          - ansible_br_test['type'] == 'bridge'
+          - ansible_br_test['ipv4']['address'] == '10.1.0.1'
+          - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'
+  vars:
+    systemd_interface_cleanup: true
+    systemd_run_networkd: yes
+    systemd_netdevs:
+      - NetDev:
+          Name: dummy2
+          Kind: dummy
+      - NetDev:
+          Name: br-test
+          Kind: bridge
+    systemd_networks:
+      - interface: "dummyX"
+        bridge: "br-test"
+      - interface: "br-test"
+        address: "10.1.0.1"
+        netmask: "255.255.255.0"

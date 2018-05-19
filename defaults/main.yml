@@ -13,15 +13,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Cleanup all known network interfaces
+# Cleanup all known network interfaces. When this option is enabled the role
+# will search for and remove all network interface files that match the prefix.
 systemd_interface_cleanup: false
+
+# Prefix for all networkd files created by this role. This prefix allows
+# deployers to set specific file names reducing the chance of a collision
+# and simplifies the network interface file cleanup operation should it ever
+# be needed. By default, the prefix is "general" however this can be changed
+# to meet the needs of the deployer.
+systemd_networkd_prefix: "general"
 
 # Enable systemd-networkd and (re)start the service
 systemd_run_networkd: false
 
 # Default filename formatting
-systemd_networkd_netdev_filename: "{{ item.0 }}-{{ item.1.NetDev.Name }}.netdev"
-systemd_networkd_network_filename: "{{ item.0 }}-{{ item.1.interface }}.network"
+systemd_networkd_netdev_filename: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.NetDev.Name }}.netdev"
+systemd_networkd_network_filename: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.interface }}.network"
 
 # The `systemd_link_config_overrides` option can be used on the default link.
 #  See the following link for all available options:
