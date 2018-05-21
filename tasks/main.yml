@@ -61,18 +61,6 @@
   tags:
     - systemd-networkd
 
-- name: Create systemd-networkd interface cleanup script
-  template:
-    src: "interface-cleanup.sh.j2"
-    dest: "/usr/local/bin/interface-cleanup"
-    owner: "root"
-    group: "root"
-    mode: "0750"
-  when:
-    - systemd_interface_cleanup | bool
-  tags:
-    - systemd-networkd
-
 - name: Create systemd-resolved config
   template:
     src: "systemd-resolved.conf.j2"
@@ -87,11 +75,25 @@
   tags:
     - systemd-resolved
 
-- name: Run interface cleanup script
-  command: "/usr/local/bin/interface-cleanup"
-  failed_when: false
+- name: Find prefixed netdev and network files
+  find:
+    paths: "/etc/systemd/network"
+    patterns: "*{{ systemd_networkd_prefix }}*.netdev,*{{ systemd_networkd_prefix }}*.network"
+  register: networkd_files
   when:
     - systemd_interface_cleanup | bool
+  tags:
+    - systemd-networkd
+
+- name: Remove prefixed network files
+  file:
+    path: "{{ item.path }}"
+    state: absent
+  with_items: "{{ networkd_files.files }}"
+  when:
+    - systemd_interface_cleanup | bool
+  notify:
+    - Restart systemd-networkd
   tags:
     - systemd-networkd
 
