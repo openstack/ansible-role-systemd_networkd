@@ -17,6 +17,9 @@
   systemd:
     name: "systemd-networkd"
     state: restarted
+    enabled: "yes"
+  async: 45
+  poll: 0
   when:
     - systemd_run_networkd | bool
   tags:
@@ -26,6 +29,7 @@
   systemd:
     name: "systemd-resolved"
     state: restarted
+    enabled: "yes"
   when:
     - systemd_resolved_available | bool
   tags:
