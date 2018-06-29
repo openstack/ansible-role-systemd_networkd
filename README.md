@@ -10,6 +10,8 @@ for you. To get the plugins role in place clone the plugins repository
 ``` bash
 # git clone https://github.com/openstack/openstack-ansible-plugins /etc/ansible/roles/plugins
 ```
+Release notes for the project can be found at:
+  https://docs.openstack.org/releasenotes/ansible-role-systemd_networkd
 
 You can also use the ``ansible-galaxy`` command on the ``ansible-role-requirements.yml`` file.
 
