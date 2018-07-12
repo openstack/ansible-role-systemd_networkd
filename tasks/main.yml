@@ -35,7 +35,7 @@
   when:
     - systemd_networkd_distro_packages | length > 0
   register: install_packages
-  until: install_packages|success
+  until: install_packages is success
   retries: 3
   delay: 2
 
