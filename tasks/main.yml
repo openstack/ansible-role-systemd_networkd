@@ -130,11 +130,9 @@
     name: "systemd-networkd"
     enabled: "yes"
     state: started
+  async: 45
+  poll: 0
   when:
     - systemd_run_networkd | bool
   tags:
     - systemd-networkd
-
-- name: (RE)Gather facts post setup
-  setup:
-    gather_subset: "network"
