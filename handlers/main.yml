@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-- name: Restart systemd-networkd
+- name: Restart networkd
   systemd:
     name: "systemd-networkd"
     state: restarted
@@ -22,8 +22,14 @@
   poll: 0
   when:
     - systemd_run_networkd | bool
+  listen: Restart systemd-networkd
   tags:
     - systemd-networkd
+
+- name: (RE)Gather facts post setup
+  setup:
+    gather_subset: "network"
+  listen: Restart systemd-networkd
 
 - name: Restart systemd-resolved
   systemd:
