@@ -22,6 +22,9 @@
   roles:
     - role: "systemd_networkd"
   vars:
+    systemd_networkd_link:
+      MACAddressPolicy: "persistent"
+      NamePolicy: "kernel database onboard slot path"
     systemd_run_networkd: yes
     systemd_resolved:
       DNS: "208.67.222.222"
@@ -64,7 +67,7 @@
       - interface: "br-dummy"
         address: "10.0.0.100"
         netmask: "255.255.255.0"
-        gateway: "10.0.0.1"
+        gateway: "{{ ansible_default_ipv4.gateway | default('10.0.0.1') }}"
         mtu: 9000
         usedns: true
         static_routes:
@@ -73,6 +76,8 @@
         config_overrides:
           Network:
             ConfigureWithoutCarrier: true
+        link_config_overrides:
+          Alias: "dummy-bridge0"
       - interface: "dummy2"
         bridge: "br-test"
       - interface: "br-test"
@@ -117,6 +122,15 @@
           - ansible_br_test['type'] == 'bridge'
           - ansible_br_test['ipv4']['address'] == '10.1.0.1'
           - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'
+    - name: Check link config overrides
+      shell: 'grep -wo "Alias" /etc/systemd/network/*br-dummy.link'
+      changed_when: false
+    - name: Check general link config
+      shell: 'grep -wo "{{ item }}" /etc/systemd/network/*.link'
+      changed_when: false
+      with_items:
+        - MACAddressPolicy
+        - NamePolicy
 
 
 - name: Playbook for role testing with cleanup

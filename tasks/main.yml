@@ -46,21 +46,6 @@
   tags:
     - systemd-networkd
 
-- name: Create systemd-networkd link
-  config_template:
-    src: "systemd-network-link.j2"
-    dest: "/etc/systemd/network/99-default.link"
-    owner: "root"
-    group: "root"
-    mode: "0644"
-    config_overrides: "{{ systemd_link_config_overrides }}"
-    config_type: "ini"
-  notify:
-    - Restart systemd-networkd
-    - Update initramfs
-  tags:
-    - systemd-networkd
-
 - name: Create systemd-resolved config
   template:
     src: "systemd-resolved.conf.j2"
@@ -100,7 +85,7 @@
 - name: Create systemd-networkd network device(s)
   template:
     src: "systemd-netdev.j2"
-    dest: "/etc/systemd/network/{{ item.1.filename | default(systemd_networkd_netdev_filename) }}"
+    dest: "/etc/systemd/network/{{ (item.1.filename | default(systemd_networkd_filename)) ~ '.netdev' }}"
     owner: "root"
     group: "root"
     mode: "0644"
@@ -110,10 +95,26 @@
   tags:
     - systemd-networkd
 
-- name: Create systemd-networkd network(s)
+- name: Create systemd-networkd network link(s)
+  config_template:
+    src: "systemd-link.j2"
+    dest: "/etc/systemd/network/{{ (item.1.filename | default(systemd_networkd_filename_alt)) ~ '.link' }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    config_overrides: "{{ item.1.link_config_overrides | default(systemd_link_config_overrides) }}"
+    config_type: "ini"
+  with_indexed_items: "{{ systemd_networks }}"
+  notify:
+    - Update initramfs
+    - Restart systemd-networkd
+  tags:
+    - systemd-networkd
+
+- name: Create systemd-networkd network network(s)
   config_template:
     src: "systemd-network.j2"
-    dest: "/etc/systemd/network/{{ item.1.filename | default(systemd_networkd_network_filename) }}"
+    dest: "/etc/systemd/network/{{ (item.1.filename | default(systemd_networkd_filename_alt)) ~ '.network' }}"
     owner: "root"
     group: "root"
     mode: "0644"

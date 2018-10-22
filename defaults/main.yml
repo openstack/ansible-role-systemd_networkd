@@ -28,8 +28,8 @@ systemd_networkd_prefix: "general"
 systemd_run_networkd: false
 
 # Default filename formatting
-systemd_networkd_netdev_filename: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.NetDev.Name }}.netdev"
-systemd_networkd_network_filename: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.interface }}.network"
+systemd_networkd_filename: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.NetDev.Name }}"
+systemd_networkd_filename_alt: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.interface }}"
 
 # The `systemd_link_config_overrides` option can be used on the default link.
 #  See the following link for all available options:
@@ -75,6 +75,10 @@ systemd_netdevs: []
 #                                   into the network file. A full list of all
 #                                   options can be found here:
 #                                   https://www.freedesktop.org/software/systemd/man/systemd.network.html
+#  `link_config_overrides` -- (Optional) Used to inject extra configuration
+#                                        options into link file. A full list
+#                                        of all options can be found here:
+#                                        https://www.freedesktop.org/software/systemd/man/systemd.link.html
 #  `interface` -- (required) Name of interface to match
 #  `address` -- (option) IP address the interface should be given. To make this
 #                        interface use DHCP set this string to "dhcp"
@@ -148,3 +152,10 @@ systemd_networkd_update_initramfs: "{{ _systemd_networkd_update_initramfs | defa
 #  - systemd-resolved
 
 systemd_networkd_distro_packages: "{{ _systemd_networkd_distro_packages | default([]) }}"
+
+# The systemd networkd service can be used to set specific link configuration options.
+# For more information on all of the possible configuration see
+# https://www.freedesktop.org/software/systemd/man/systemd.link.html
+
+systemd_networkd_link:
+  MACAddressPolicy: "persistent"

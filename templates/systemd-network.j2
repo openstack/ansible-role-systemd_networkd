@@ -55,8 +55,3 @@ MACVLAN={{ item.1.macvlan }}
 {% elif item.1.vxlan is defined %}
 VXLAN={{ item.1.vxlan }}
 {% endif %}
-
-[Link]
-{% if item.1.mtu is defined %}
-MTUBytes={{ item.1.mtu }}
-{% endif %}
