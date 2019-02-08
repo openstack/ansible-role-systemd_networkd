@@ -95,6 +95,10 @@ systemd_netdevs: []
 #  `static_routes` -- (optional) list of routes to use for the network. This
 #                                option requires a gateway and cidr to be set
 #                                within the list item.
+#  `ipforward` -- (optional) When set to true forwarding will be enabled for
+#                            interface.  This setting will enable
+#                            net.ipv4.ip_forward, net.ipv4.conf.all.forwarding
+#                            and net.ipv4.conf.interface.forwarding
 
 # systemd_networks:
 #   - interface: "dummy0"

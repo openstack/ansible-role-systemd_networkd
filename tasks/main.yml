@@ -137,3 +137,18 @@
     - systemd_run_networkd | bool
   tags:
     - systemd-networkd
+
+- name: restart systemd_networkd prior to applying sysctl changes
+  meta: flush_handlers
+
+- name: Add IP Forward for interface
+  sysctl:
+    name: "net.ipv4.conf.{{ item.1.interface }}.forwarding"
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  with_indexed_items: "{{ systemd_networks }}"
+  when:
+    - (ansible_os_family | lower) == 'redhat'
+    - item.1.ipforward | default(false) | bool

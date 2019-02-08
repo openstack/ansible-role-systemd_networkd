@@ -54,6 +54,9 @@
       - NetDev:
           Name: br-test
           Kind: bridge
+      - NetDev:
+          Name: br-test2
+          Kind: bridge
     systemd_networks:
       - interface: "dummy0"
         bond: "bond0"
@@ -83,6 +86,10 @@
       - interface: "br-test"
         address: "10.1.0.1"
         netmask: "255.255.255.0"
+      - interface: "br-test2"
+        address: 10.2.0.1
+        netmask: "255.255.255.0"
+        ipforward: true
 
 
 - name: Test networkd
@@ -131,6 +138,13 @@
       with_items:
         - MACAddressPolicy
         - NamePolicy
+    - name: Check forwarding is enabled
+      shell: 'grep -wo ^1$ /proc/sys/net/{{ item }}'
+      changed_when: false
+      with_items:
+        - "ipv4/ip_forward"
+        - "ipv4/conf/all/forwarding"
+        - "ipv4/conf/br-test2/forwarding"
 
 
 - name: Playbook for role testing with cleanup

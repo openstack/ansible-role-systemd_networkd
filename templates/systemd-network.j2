@@ -55,3 +55,6 @@ MACVLAN={{ item.1.macvlan }}
 {% elif item.1.vxlan is defined %}
 VXLAN={{ item.1.vxlan }}
 {% endif %}
+{% if item.1.ipforward is defined %}
+IPForward={{ (item.1.ipforward | bool) | ternary('yes', 'no') }}
+{% endif %}
