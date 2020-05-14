@@ -54,7 +54,7 @@
     group: "root"
     mode: "0644"
   when:
-    - systemd_resolved
+    - systemd_resolved | bool
   notify:
     - Restart systemd-resolved
   tags:
