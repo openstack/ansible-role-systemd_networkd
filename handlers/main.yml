@@ -28,7 +28,7 @@
 
 - name: (RE)Gather facts post setup
   setup:
-    gather_subset: "network"
+    gather_subset: "network,hardware,virtual"
   listen: Restart systemd-networkd
 
 - name: Restart systemd-resolved
@@ -44,3 +44,11 @@
 
 - name: Update initramfs
   command: "{{ systemd_networkd_update_initramfs }}"
+  when:
+   - ansible_virtualization_type != "systemd-nspawn"
+   - ansible_virtualization_type != "lxc"
+   - ansible_virtualization_type != "lxd"
+   - ansible_virtualization_type != "podman"
+   - ansible_virtualization_type != "docker"
+   - ansible_virtualization_type != "systemd_container"
+   - ansible_virtualization_type != "container"
