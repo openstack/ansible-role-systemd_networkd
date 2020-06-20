@@ -26,12 +26,30 @@
   tags:
     - always
 
+- name: Install the EPEL repository
+  yum_repository:
+    name: epel-networkd
+    baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_distribution_major_version ~ '/Everything/' ~ ansible_architecture }}"
+    description: 'Extra Packages for Enterprise Linux $releasever - $basearch'
+    gpgcheck: yes
+    enabled: yes
+    state: present
+    includepkgs: 'systemd-networkd'
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_major_version is version('8', '>=')
+  register: install_epel_repo
+  until: install_epel_repo  is success
+  retries: 5
+  delay: 2
+
 - name: Install networkd distro packages
   package:
     name: "{{ systemd_networkd_distro_packages }}"
     state: "present"
     update_cache: "{{ (ansible_pkg_mgr == 'apt') | ternary('yes', omit) }}"
     cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(600, omit) }}"
+    enablerepo: "{{ systemd_networkd_enablerepo | default(omit) }}"
   when:
     - systemd_networkd_distro_packages | length > 0
   register: install_packages
