@@ -101,31 +101,31 @@
     - name: Interface check
       assert:
         that:
-          - ansible_dummy0['active'] == true
+          - ansible_dummy0['active']
           - ansible_dummy0['type'] == 'ether'
           - ansible_dummy0['mtu'] == 9000
-          - ansible_dummy1['active'] == true
+          - ansible_dummy1['active']
           - ansible_dummy1['type'] == 'ether'
           - ansible_dummy1['mtu'] == 9000
-          - ansible_dummy2['active'] == true
+          - ansible_dummy2['active']
           - ansible_dummy2['type'] == 'ether'
     - name: Bond check
       assert:
         that:
-          - ansible_bond0['active'] == true
+          - ansible_bond0['active']
           - ansible_bond0['type'] == 'bonding'
           - ansible_bond0['mtu'] == 9000
     - name: Bridge check
       assert:
         that:
-          - ansible_br_dummy['active'] == true
+          - ansible_br_dummy['active']
           - ansible_br_dummy['type'] == 'bridge'
           - ansible_br_dummy['ipv4']['address'] == '10.0.0.100'
           - ansible_br_dummy['ipv4']['netmask'] == '255.255.255.0'
     - name: Bridge check
       assert:
         that:
-          - ansible_br_test['active'] == true
+          - ansible_br_test['active']
           - ansible_br_test['type'] == 'bridge'
           - ansible_br_test['ipv4']['address'] == '10.1.0.1'
           - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'
@@ -159,12 +159,12 @@
       assert:
         that:
           - ansible_br_test is defined
-          - ansible_dummy2['active'] == true
+          - ansible_dummy2['active']
           - ansible_dummy2['type'] == 'ether'
     - name: Bridge check
       assert:
         that:
-          - ansible_br_test['active'] == true
+          - ansible_br_test['active']
           - ansible_br_test['type'] == 'bridge'
           - ansible_br_test['ipv4']['address'] == '10.1.0.1'
           - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'

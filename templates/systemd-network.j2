@@ -58,3 +58,8 @@ VXLAN={{ item.1.vxlan }}
 {% if item.1.ipforward is defined %}
 IPForward={{ (item.1.ipforward | bool) | ternary('yes', 'no') }}
 {% endif %}
+
+[Link]
+{% if item.1.mtu is defined %}
+MTUBytes={{ item.1.mtu }}
+{% endif %}
