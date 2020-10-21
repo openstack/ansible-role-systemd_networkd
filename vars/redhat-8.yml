@@ -21,3 +21,8 @@ _systemd_resolved_available: false
 _systemd_networkd_update_initramfs: "dracut -f"
 
 systemd_networkd_enablerepo: epel
+
+systemd_networkd_package_repos_keys:
+  - name: epel-8
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
+    keyfile: gpg/2F86D6A1

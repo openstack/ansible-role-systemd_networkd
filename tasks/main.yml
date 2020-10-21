@@ -26,6 +26,43 @@
   tags:
     - always
 
+# Copy all factored-in GPG keys.
+# KeyID 2F86D6A1 from https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+- name: If a keyfile is provided, copy the gpg keyfile to the key location
+  copy:
+    src: "{{ item.keyfile }}"
+    dest: "{{ item.key }}"
+    mode: '0644'
+  with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile','defined') | list }}"
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_major_version is version('8', '>=')
+
+- name: Ensure GPG keys have the correct SELinux contexts applied
+  command: restorecon -Rv /etc/pki/rpm-gpg/
+  # TODO(evrardjp): Be more idempotent
+  changed_when: false
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_major_version is version('8', '>=')
+
+# Handle gpg keys manually
+- name: Install gpg keys
+  rpm_key:
+    key: "{{ key.key }}"
+    validate_certs: "{{ key.validate_certs | default(omit) }}"
+    state: "{{ key.state | default('present') }}"
+  with_items: "{{ systemd_networkd_package_repos_keys }}"
+  loop_control:
+    loop_var: key
+  register: _add_yum_keys
+  until: _add_yum_keys  is success
+  retries: 5
+  delay: 2
+  when:
+    - ansible_os_family | lower == 'redhat'
+    - ansible_distribution_major_version is version('8', '>=')
+
 - name: Install the EPEL repository
   yum_repository:
     name: epel-networkd
