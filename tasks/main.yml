@@ -63,11 +63,13 @@
     - ansible_os_family | lower == 'redhat'
     - ansible_distribution_major_version is version('8', '>=')
 
+# NOTE(jrosser) this repo is configured with the path to the first gpg key provided
 - name: Install the EPEL repository
   yum_repository:
     name: epel-networkd
     baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_distribution_major_version ~ '/Everything/' ~ ansible_architecture }}"
     description: 'Extra Packages for Enterprise Linux $releasever - $basearch'
+    gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
     gpgcheck: yes
     enabled: yes
     state: present
