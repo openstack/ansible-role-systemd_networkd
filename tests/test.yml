@@ -70,7 +70,7 @@
       - interface: "br-dummy"
         address: "10.0.0.100"
         netmask: "255.255.255.0"
-        gateway: "{{ ansible_default_ipv4.gateway | default('10.0.0.1') }}"
+        gateway: "{{ ansible_facts['default_ipv4']['gateway'] | default('10.0.0.1') }}"
         mtu: 9000
         usedns: true
         static_routes:
@@ -101,34 +101,34 @@
     - name: Interface check
       assert:
         that:
-          - ansible_dummy0['active']
-          - ansible_dummy0['type'] == 'ether'
-          - ansible_dummy0['mtu'] == 9000
-          - ansible_dummy1['active']
-          - ansible_dummy1['type'] == 'ether'
-          - ansible_dummy1['mtu'] == 9000
-          - ansible_dummy2['active']
-          - ansible_dummy2['type'] == 'ether'
+          - ansible_facts['dummy0']['active']
+          - ansible_facts['dummy0']['type'] == 'ether'
+          - ansible_facts['dummy0']['mtu'] == 9000
+          - ansible_facts['dummy1']['active']
+          - ansible_facts['dummy1']['type'] == 'ether'
+          - ansible_facts['dummy1']['mtu'] == 9000
+          - ansible_facts['dummy2']['active']
+          - ansible_facts['dummy2']['type'] == 'ether'
     - name: Bond check
       assert:
         that:
-          - ansible_bond0['active']
-          - ansible_bond0['type'] == 'bonding'
-          - ansible_bond0['mtu'] == 9000
+          - ansible_facts['bond0']['active']
+          - ansible_facts['bond0']['type'] == 'bonding'
+          - ansible_facts['bond0']['mtu'] == 9000
     - name: Bridge check
       assert:
         that:
-          - ansible_br_dummy['active']
-          - ansible_br_dummy['type'] == 'bridge'
-          - ansible_br_dummy['ipv4']['address'] == '10.0.0.100'
-          - ansible_br_dummy['ipv4']['netmask'] == '255.255.255.0'
+          - ansible_facts['br_dummy']['active']
+          - ansible_facts['br_dummy']['type'] == 'bridge'
+          - ansible_facts['br_dummy']['ipv4']['address'] == '10.0.0.100'
+          - ansible_facts['br_dummy']['ipv4']['netmask'] == '255.255.255.0'
     - name: Bridge check
       assert:
         that:
-          - ansible_br_test['active']
-          - ansible_br_test['type'] == 'bridge'
-          - ansible_br_test['ipv4']['address'] == '10.1.0.1'
-          - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'
+          - ansible_facts['br_test']['active']
+          - ansible_facts['br_test']['type'] == 'bridge'
+          - ansible_facts['br_test']['ipv4']['address'] == '10.1.0.1'
+          - ansible_facts['br_test']['ipv4']['netmask'] == '255.255.255.0'
     - name: Check link config overrides
       shell: 'grep -wo "Alias" /etc/systemd/network/*br-dummy.link'
       changed_when: false
@@ -158,16 +158,16 @@
     - name: Interface check
       assert:
         that:
-          - ansible_br_test is defined
-          - ansible_dummy2['active']
-          - ansible_dummy2['type'] == 'ether'
+          - ansible_facts['br_test'] is defined
+          - ansible_facts['dummy2']['active']
+          - ansible_facts['dummy2']['type'] == 'ether'
     - name: Bridge check
       assert:
         that:
-          - ansible_br_test['active']
-          - ansible_br_test['type'] == 'bridge'
-          - ansible_br_test['ipv4']['address'] == '10.1.0.1'
-          - ansible_br_test['ipv4']['netmask'] == '255.255.255.0'
+          - ansible_facts['br_test']['active']
+          - ansible_facts['br_test']['type'] == 'bridge'
+          - ansible_facts['br_test']['ipv4']['address'] == '10.1.0.1'
+          - ansible_facts['br_test']['ipv4']['netmask'] == '255.255.255.0'
   vars:
     systemd_interface_cleanup: true
     systemd_run_networkd: yes

@@ -17,11 +17,11 @@
   include_vars: "{{ item }}"
   with_first_found:
     - files:
-        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
-        - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
-        - "{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
-        - "{{ ansible_distribution | lower }}.yml"
-        - "{{ ansible_os_family | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+        - "{{ ansible_facts['distribution'] | lower }}.yml"
+        - "{{ ansible_facts['os_family'] | lower }}.yml"
       skip: true
   tags:
     - always
@@ -35,16 +35,16 @@
     mode: '0644'
   with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile','defined') | list }}"
   when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_major_version is version('8', '>=')
+    - ansible_facts['os_family'] | lower == 'redhat'
+    - ansible_facts['distribution_major_version'] is version('8', '>=')
 
 - name: Ensure GPG keys have the correct SELinux contexts applied
   command: restorecon -Rv /etc/pki/rpm-gpg/
   # TODO(evrardjp): Be more idempotent
   changed_when: false
   when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_major_version is version('8', '>=')
+    - ansible_facts['os_family'] | lower == 'redhat'
+    - ansible_facts['distribution_major_version'] is version('8', '>=')
 
 # Handle gpg keys manually
 - name: Install gpg keys
@@ -60,21 +60,21 @@
   retries: 5
   delay: 2
   when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_major_version is version('8', '>=')
+    - ansible_facts['os_family'] | lower == 'redhat'
+    - ansible_facts['distribution_major_version'] is version('8', '>=')
 
 - name: Install the EPEL repository
   yum_repository:
     name: epel-networkd
-    baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_distribution_major_version ~ '/Everything/' ~ ansible_architecture }}"
+    baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
     description: 'Extra Packages for Enterprise Linux $releasever - $basearch'
     gpgcheck: yes
     enabled: yes
     state: present
     includepkgs: 'systemd-networkd'
   when:
-    - ansible_os_family | lower == 'redhat'
-    - ansible_distribution_major_version is version('8', '>=')
+    - ansible_facts['os_family'] | lower == 'redhat'
+    - ansible_facts['distribution_major_version'] is version('8', '>=')
   register: install_epel_repo
   until: install_epel_repo  is success
   retries: 5
@@ -84,8 +84,8 @@
   package:
     name: "{{ systemd_networkd_distro_packages }}"
     state: "present"
-    update_cache: "{{ (ansible_pkg_mgr == 'apt') | ternary('yes', omit) }}"
-    cache_valid_time: "{{ (ansible_pkg_mgr == 'apt') | ternary(600, omit) }}"
+    update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
+    cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(600, omit) }}"
     enablerepo: "{{ systemd_networkd_enablerepo | default(omit) }}"
   when:
     - systemd_networkd_distro_packages | length > 0
@@ -205,5 +205,5 @@
     reload: yes
   with_indexed_items: "{{ systemd_networks }}"
   when:
-    - (ansible_os_family | lower) == 'redhat'
+    - (ansible_facts['os_family'] | lower) == 'redhat'
     - item.1.ipforward | default(false) | bool
