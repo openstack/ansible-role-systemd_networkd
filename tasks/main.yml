@@ -36,7 +36,6 @@
   with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile','defined') | list }}"
   when:
     - ansible_facts['os_family'] | lower == 'redhat'
-    - ansible_facts['distribution_major_version'] is version('8', '>=')
 
 - name: Ensure GPG keys have the correct SELinux contexts applied
   command: restorecon -Rv /etc/pki/rpm-gpg/
@@ -44,7 +43,6 @@
   changed_when: false
   when:
     - ansible_facts['os_family'] | lower == 'redhat'
-    - ansible_facts['distribution_major_version'] is version('8', '>=')
 
 # Handle gpg keys manually
 - name: Install gpg keys
@@ -61,7 +59,6 @@
   delay: 2
   when:
     - ansible_facts['os_family'] | lower == 'redhat'
-    - ansible_facts['distribution_major_version'] is version('8', '>=')
 
 # NOTE(jrosser) this repo is configured with the path to the first gpg key provided
 - name: Install the EPEL repository
@@ -76,7 +73,6 @@
     includepkgs: 'systemd-networkd'
   when:
     - ansible_facts['os_family'] | lower == 'redhat'
-    - ansible_facts['distribution_major_version'] is version('8', '>=')
   register: install_epel_repo
   until: install_epel_repo  is success
   retries: 5
