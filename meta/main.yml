@@ -14,11 +14,12 @@
 # limitations under the License.
 
 galaxy_info:
-  author: rcbops
+  author: rcb ops
   description: Installation and setup of systemd_networkd
   company: Rackspace
   license: Apache2
   min_ansible_version: 2.0
+  role_name: systemd_networkd
   platforms:
     - name: Debian
       versions:
