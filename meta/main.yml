@@ -33,5 +33,3 @@ galaxy_info:
   categories:
     - systemd
     - development
-  dependencies:
-    - plugins
