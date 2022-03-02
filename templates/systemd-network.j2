@@ -37,7 +37,7 @@ Metric={{ 20 + loop.index }}
 {%   if _addr.address == 'dhcp' %}
 DHCP=yes
 {%   else %}
-{%   set _addr_cidr = (_addr.address ~ '/' ~ _addr.netmask | default('')).rstrip('/') | ipaddr('host') %}
+{%   set _addr_cidr = (_addr.address ~ '/' ~ _addr.netmask | default('')).rstrip('/') | ansible.utils.ipaddr('host') %}
 Address={{ _addr_cidr }}
 {%   endif %}
 {%   if _addr.gateway is defined %}
