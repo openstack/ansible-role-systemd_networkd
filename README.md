@@ -2,22 +2,20 @@
 
 This Ansible role configures systemd-networkd link, network, and netdev files.
 
-This role requires the ``openstack-ansible-plugins`` repository to be available
-on your local system. The Ansible galaxy resolver will not retrieve this role
-for you. To get the plugins role in place clone the plugins repository
-**before** running this role.
+This role requires the ``ansible-config_template`` collection to be available
+on your local system.
+
+To get collection you can use use the ``ansible-galaxy`` command on the
+``requirements.yml`` file.. You need to install collection **before**
+running this role.
 
 ``` bash
-# git clone https://github.com/openstack/openstack-ansible-plugins /etc/ansible/roles/plugins
+# ansible-galaxy install -r requirements.yml
 ```
+
 Release notes for the project can be found at:
   https://docs.openstack.org/releasenotes/ansible-role-systemd_networkd
 
-You can also use the ``ansible-galaxy`` command on the ``ansible-role-requirements.yml`` file.
-
-``` bash
-# ansible-galaxy install -r ansible-role-requirements.yml
-```
 
 ----
 
