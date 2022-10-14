@@ -28,71 +28,73 @@
   tags:
     - always
 
-# Copy all factored-in GPG keys.
-# KeyID 2F86D6A1 from https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
-- name: If a keyfile is provided, copy the gpg keyfile to the key location
-  copy:
-    src: "{{ item.keyfile }}"
-    dest: "{{ item.key }}"
-    mode: '0644'
-  with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile','defined') | list }}"
-  when:
-    - ansible_facts['os_family'] | lower == 'redhat'
-
-- name: Ensure GPG keys have the correct SELinux contexts applied
-  command: restorecon -Rv /etc/pki/rpm-gpg/
-  # TODO(evrardjp): Be more idempotent
-  changed_when: false
-  when:
-    - ansible_facts['os_family'] | lower == 'redhat'
-
-# Handle gpg keys manually
-- name: Install gpg keys
-  rpm_key:
-    key: "{{ key.key }}"
-    validate_certs: "{{ key.validate_certs | default(omit) }}"
-    state: "{{ key.state | default('present') }}"
-  with_items: "{{ systemd_networkd_package_repos_keys }}"
-  loop_control:
-    loop_var: key
-  register: _add_yum_keys
-  until: _add_yum_keys  is success
-  retries: 5
-  delay: 2
-  when:
-    - ansible_facts['os_family'] | lower == 'redhat'
-
-# NOTE(jrosser) this repo is configured with the path to the first gpg key provided
-- name: Install the EPEL repository
-  yum_repository:
-    name: epel-networkd
-    baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
-    description: 'Extra Packages for Enterprise Linux $releasever - $basearch'
-    gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
-    gpgcheck: yes
-    enabled: yes
-    state: present
-    includepkgs: 'systemd-networkd'
-  when:
-    - ansible_facts['os_family'] | lower == 'redhat'
-  register: install_epel_repo
-  until: install_epel_repo  is success
-  retries: 5
-  delay: 2
-
-- name: Install networkd distro packages
-  package:
-    name: "{{ systemd_networkd_distro_packages }}"
-    state: "present"
-    update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
-    cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(600, omit) }}"
-    enablerepo: "{{ systemd_networkd_enablerepo | default(omit) }}"
+- name: Install required repos and packages
   when:
     - systemd_networkd_distro_packages | length > 0
-  register: install_packages
-  until: install_packages is success
-  retries: 3
-  delay: 2
+  block:
+    # Copy all factored-in GPG keys.
+    # KeyID 2F86D6A1 from https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
+    - name: If a keyfile is provided, copy the gpg keyfile to the key location
+      copy:
+        src: "{{ item.keyfile }}"
+        dest: "{{ item.key }}"
+        mode: '0644'
+      with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile','defined') | list }}"
+      when:
+        - ansible_facts['os_family'] | lower == 'redhat'
+
+    - name: Ensure GPG keys have the correct SELinux contexts applied
+      command: restorecon -Rv /etc/pki/rpm-gpg/
+      # TODO(evrardjp): Be more idempotent
+      changed_when: false
+      when:
+        - ansible_facts['os_family'] | lower == 'redhat'
+
+    # Handle gpg keys manually
+    - name: Install gpg keys
+      rpm_key:
+        key: "{{ key.key }}"
+        validate_certs: "{{ key.validate_certs | default(omit) }}"
+        state: "{{ key.state | default('present') }}"
+      with_items: "{{ systemd_networkd_package_repos_keys }}"
+      loop_control:
+        loop_var: key
+      register: _add_yum_keys
+      until: _add_yum_keys  is success
+      retries: 5
+      delay: 2
+      when:
+        - ansible_facts['os_family'] | lower == 'redhat'
+
+    # NOTE(jrosser) this repo is configured with the path to the first gpg key provided
+    - name: Install the EPEL repository
+      yum_repository:
+        name: epel-networkd
+        baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
+        description: 'Extra Packages for Enterprise Linux $releasever - $basearch'
+        gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
+        gpgcheck: yes
+        enabled: yes
+        state: present
+        includepkgs: 'systemd-networkd'
+      when:
+        - ansible_facts['os_family'] | lower == 'redhat'
+      register: install_epel_repo
+      until: install_epel_repo  is success
+      retries: 5
+      delay: 2
+
+    - name: Install networkd distro packages
+      package:
+        name: "{{ systemd_networkd_distro_packages }}"
+        state: "present"
+        update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
+        cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(600, omit) }}"
+        enablerepo: "{{ systemd_networkd_enablerepo | default(omit) }}"
+      register: install_packages
+      until: install_packages is success
+      retries: 3
+      delay: 2
 
 - name: Create systemd-networkd directory
   file:
