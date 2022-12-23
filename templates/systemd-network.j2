@@ -49,7 +49,13 @@ Bridge={{ item.1.bridge }}
 {% elif item.1.bond is defined %}
 Bond={{ item.1.bond }}
 {% elif item.1.vlan is defined %}
+{%   if item.1.vlan is iterable and item.1.vlan is not string %}
+{%     for vlan in item.1.vlan %}
+VLAN={{ vlan }}
+{%     endfor %}
+{%   else %}
 VLAN={{ item.1.vlan }}
+{%   endif %}
 {% elif item.1.macvlan is defined %}
 MACVLAN={{ item.1.macvlan }}
 {% elif item.1.vxlan is defined %}
