@@ -12,7 +12,7 @@ RouteMetric=20
 
 {% for route in item.1.static_routes | default([]) %}
 [Route]
-Source={{ route['cidr'] }}
+Destination={{ route['cidr'] }}
 Gateway={{ route['gateway'] }}
 Metric={{ 20 + loop.index }}
 
