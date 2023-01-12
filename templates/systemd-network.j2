@@ -40,7 +40,7 @@ DHCP=yes
 {%   set _addr_cidr = (_addr.address ~ '/' ~ _addr.netmask | default('')).rstrip('/') | ansible.utils.ipaddr('host') %}
 Address={{ _addr_cidr }}
 {%   endif %}
-{%   if _addr.gateway is defined %}
+{%   if _addr.gateway is defined and (_addr.gateway | length) > 0 %}
 Gateway={{ item.1.gateway }}
 {%   endif %}
 {% endfor %}
@@ -60,6 +60,6 @@ IPForward={{ (item.1.ipforward | bool) | ternary('yes', 'no') }}
 {% endif %}
 
 [Link]
-{% if item.1.mtu is defined %}
+{% if item.1.mtu is defined and item.1.mtu %}
 MTUBytes={{ item.1.mtu }}
 {% endif %}
