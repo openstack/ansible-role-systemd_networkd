@@ -18,18 +18,20 @@ galaxy_info:
   description: Installation and setup of systemd_networkd
   company: Rackspace
   license: Apache2
-  min_ansible_version: 2.0
+  role_name: systemd_networkd
+  namespace: openstack
+  min_ansible_version: "2.10"
   platforms:
     - name: Debian
       versions:
-        - buster
+        - bullseye
     - name: Ubuntu
       versions:
-        - bionic
         - focal
+        - jammy
     - name: EL
       versions:
-        - 8
-  categories:
+        - "9"
+  galaxy_tags:
     - systemd
     - development

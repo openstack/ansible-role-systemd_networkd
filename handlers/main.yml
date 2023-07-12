@@ -43,12 +43,12 @@
     - systemd-resolved
 
 - name: Update initramfs
-  command: "{{ systemd_networkd_update_initramfs }}"
+  command: "{{ systemd_networkd_update_initramfs }}" # noqa: no-changed-when
   when:
-   - ansible_facts['virtualization_type'] != "systemd-nspawn"
-   - ansible_facts['virtualization_type'] != "lxc"
-   - ansible_facts['virtualization_type'] != "lxd"
-   - ansible_facts['virtualization_type'] != "podman"
-   - ansible_facts['virtualization_type'] != "docker"
-   - ansible_facts['virtualization_type'] != "systemd_container"
-   - ansible_facts['virtualization_type'] != "container"
+    - ansible_facts['virtualization_type'] != "systemd-nspawn"
+    - ansible_facts['virtualization_type'] != "lxc"
+    - ansible_facts['virtualization_type'] != "lxd"
+    - ansible_facts['virtualization_type'] != "podman"
+    - ansible_facts['virtualization_type'] != "docker"
+    - ansible_facts['virtualization_type'] != "systemd_container"
+    - ansible_facts['virtualization_type'] != "container"

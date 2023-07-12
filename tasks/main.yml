@@ -39,7 +39,7 @@
         src: "{{ item.keyfile }}"
         dest: "{{ item.key }}"
         mode: '0644'
-      with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile','defined') | list }}"
+      with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile', 'defined') | list }}"
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
 
@@ -100,6 +100,7 @@
   file:
     path: "/etc/systemd/network"
     state: directory
+    mode: "0755"
   tags:
     - systemd-networkd
 
@@ -195,7 +196,7 @@
   tags:
     - systemd-networkd
 
-- name: restart systemd_networkd prior to applying sysctl changes
+- name: Restart systemd_networkd prior to applying sysctl changes
   meta: flush_handlers
 
 - name: Add IP Forward for interface
