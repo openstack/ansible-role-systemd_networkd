@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+{% for route in item['static_routes'] %}
+[Route]
+Destination={{ route['cidr'] }}
+Gateway={{ route['gateway'] }}
+Metric={{ 20 + loop.index }}
+
+{% endfor %}
