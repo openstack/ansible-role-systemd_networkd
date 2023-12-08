@@ -15,3 +15,21 @@
 
 ## APT Cache options
 cache_timeout: 600
+
+_systemd_networks_named: |-
+  {% set named_networks = systemd_networks | selectattr('filename', 'defined') %}
+  {% for network in systemd_networks | rejectattr('filename', 'defined') %}
+  {%   set network_filename = [loop.index0, systemd_networkd_prefix, network['interface']] %}
+  {%   set _ = network.update({'filename': network_filename | join('-') }) %}
+  {%   set _ = named_networks.append(network) %}
+  {% endfor %}
+  {{ named_networks }}
+
+_systemd_netdevs_named: |-
+  {% set named_netdevs = systemd_netdevs | selectattr('filename', 'defined') %}
+  {% for netdev in systemd_netdevs | rejectattr('filename', 'defined') %}
+  {%   set netdev_filename = [loop.index0, systemd_networkd_prefix, netdev['NetDev']['Name']] %}
+  {%   set _ = netdev.update({'filename': netdev_filename | join('-') }) %}
+  {%   set _ = named_netdevs.append(netdev) %}
+  {% endfor %}
+  {{ named_netdevs }}

@@ -27,10 +27,6 @@ systemd_networkd_prefix: "general"
 # Enable systemd-networkd and (re)start the service
 systemd_run_networkd: false
 
-# Default filename formatting
-systemd_networkd_filename: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.NetDev.Name }}"
-systemd_networkd_filename_alt: "{{ item.0 }}-{{ systemd_networkd_prefix }}-{{ item.1.interface }}"
-
 # The `systemd_link_config_overrides` option can be used on the default link.
 #  See the following link for all available options:
 #   https://www.freedesktop.org/software/systemd/man/systemd.link.html
@@ -75,6 +71,11 @@ systemd_netdevs: []
 #                                   into the network file. A full list of all
 #                                   options can be found here:
 #                                   https://www.freedesktop.org/software/systemd/man/systemd.network.html
+#  `filename` -- (Optional, Recommended) Defines resulted filename for config
+#                                        to be placed in. For consistency and more
+#                                        expected behaviour when list of networks
+#                                        may change it is recommended to supply
+#                                        filename for each interface.
 #  `link_config_overrides` -- (Optional) Used to inject extra configuration
 #                                        options into link file. A full list
 #                                        of all options can be found here:
