@@ -10,14 +10,6 @@ UseNTP=yes
 RouteMetric=20
 {% endif %}
 
-{% for route in item.1.static_routes | default([]) %}
-[Route]
-Destination={{ route['cidr'] }}
-Gateway={{ route['gateway'] }}
-Metric={{ 20 + loop.index }}
-
-{% endfor %}
-
 {%- if item.1.address is not defined %}
 {#   Address is not defined #}
 {%   set _addresses = [] %}
