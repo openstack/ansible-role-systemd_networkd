@@ -183,6 +183,24 @@
   tags:
     - systemd-networkd
 
+- name: Create systemd-networkd extra config folder
+  ansible.builtin.file:
+    path: "/etc/systemd/network/{{ item }}.network.d"
+    owner: "root"
+    group: "root"
+    mode: "0755"
+    state: directory
+  loop: "{{ _systemd_networks_named | selectattr('static_routes', 'defined') | map(attribute='filename') }}"
+
+- name: Place systemd-networkd network routes
+  ansible.builtin.template:
+    src: systemd-network-routes.j2
+    dest: "/etc/systemd/network/{{ item['filename'] }}.network.d/routes.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  loop: "{{ _systemd_networks_named | selectattr('static_routes', 'defined') }}"
+
 - name: Enable and start systemd-networkd
   systemd:
     name: "systemd-networkd"
