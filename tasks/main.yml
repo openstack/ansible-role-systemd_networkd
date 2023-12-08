@@ -142,11 +142,11 @@
 - name: Create systemd-networkd network device(s)
   template:
     src: "systemd-netdev.j2"
-    dest: "/etc/systemd/network/{{ (item.1.filename | default(systemd_networkd_filename)) ~ '.netdev' }}"
+    dest: "/etc/systemd/network/{{ item.1.filename }}.netdev"
     owner: "root"
     group: "root"
     mode: "0644"
-  with_indexed_items: "{{ systemd_netdevs }}"
+  with_indexed_items: "{{ _systemd_netdevs_named }}"
   notify:
     - Restart systemd-networkd
   tags:
@@ -155,13 +155,13 @@
 - name: Create systemd-networkd network link(s)
   openstack.config_template.config_template:
     src: "systemd-link.j2"
-    dest: "/etc/systemd/network/{{ (item.1.filename | default(systemd_networkd_filename_alt)) ~ '.link' }}"
+    dest: "/etc/systemd/network/{{ item.1.filename }}.link"
     owner: "root"
     group: "root"
     mode: "0644"
     config_overrides: "{{ item.1.link_config_overrides | default(systemd_link_config_overrides) }}"
     config_type: "ini"
-  with_indexed_items: "{{ systemd_networks }}"
+  with_indexed_items: "{{ _systemd_networks_named }}"
   notify:
     - Update initramfs
     - Restart systemd-networkd
@@ -171,13 +171,13 @@
 - name: Create systemd-networkd network network(s)
   openstack.config_template.config_template:
     src: "systemd-network.j2"
-    dest: "/etc/systemd/network/{{ (item.1.filename | default(systemd_networkd_filename_alt)) ~ '.network' }}"
+    dest: "/etc/systemd/network/{{ item.1.filename }}.network"
     owner: "root"
     group: "root"
     mode: "0644"
     config_overrides: "{{ item.1.config_overrides | default({}) }}"
     config_type: "ini"
-  with_indexed_items: "{{ systemd_networks }}"
+  with_indexed_items: "{{ _systemd_networks_named }}"
   notify:
     - Restart systemd-networkd
   tags:
@@ -205,7 +205,7 @@
     sysctl_set: yes
     state: present
     reload: yes
-  with_indexed_items: "{{ systemd_networks }}"
+  with_indexed_items: "{{ _systemd_networks_named }}"
   when:
     - (ansible_facts['os_family'] | lower) == 'redhat'
     - item.1.ipforward | default(false) | bool
