@@ -16,7 +16,7 @@
 - name: Restart networkd
   systemd:
     name: "systemd-networkd"
-    state: restarted
+    state: reloaded
     enabled: "yes"
   async: 45
   poll: 0
