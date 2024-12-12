@@ -1,9 +1,18 @@
 # {{ ansible_managed }}
-
 {% for route in item['static_routes'] %}
-[Route]
-Destination={{ route['cidr'] }}
-Gateway={{ route['gateway'] }}
-Metric={{ 20 + loop.index }}
+{%   set route_keys = route.keys() %}
+{%   if 'cidr' in route_keys %}
+{%     set _ = route.update({'Destination': route.pop('cidr')}) %}
+{%   endif %}
+{%   if 'gateway' in route_keys %}
+{%     set _ = route.update({'Gateway': route.pop('gateway')}) %}
+{%   endif %}
 
+[Route]
+{%   for key, value in route.items() %}
+{{ key }}={{ value }}
+{%   endfor %}
+{%   if 'Metric' not in route_keys %}
+Metric={{ 20 + loop.index }}
+{%   endif%}
 {% endfor %}

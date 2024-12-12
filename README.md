@@ -64,8 +64,8 @@ Release notes for the project can be found at:
           mtu: 9000
           usedns: true
           static_routes:
-            - gateway: "10.1.0.1"
-              cidr: "10.1.0.0/24"
+            - Gateway: "10.1.0.1"
+              Destination: "10.1.0.0/24"
           config_overrides:
             Network:
               ConfigureWithoutCarrier: true
