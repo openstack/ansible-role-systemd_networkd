@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+
+{% for rule in item['routing_rules'] %}
+[RoutingPolicyRule]
+{% for key, val in rule.items() %}
+{{ key }}={{ val }}
+{% endfor %}
+
+{% endfor %}

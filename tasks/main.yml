@@ -194,6 +194,17 @@
     state: directory
   loop: "{{ _systemd_networks_named | selectattr('static_routes', 'defined') | map(attribute='filename') }}"
 
+- name: Place systemd-networkd routing policy rules
+  ansible.builtin.template:
+    src: systemd-network-rules.j2
+    dest: "/etc/systemd/network/{{ item['filename'] }}.network.d/rules.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+  loop: "{{ _systemd_networks_named | selectattr('routing_rules', 'defined') }}"
+  notify:
+    - Restart systemd-networkd
+
 - name: Place systemd-networkd network routes
   ansible.builtin.template:
     src: systemd-network-routes.j2

@@ -96,6 +96,8 @@ systemd_netdevs: []
 #  `static_routes` -- (optional) list of routes to use for the network. This
 #                                option requires a gateway and cidr to be set
 #                                within the list item.
+#  `routing_rules` -- (optional) list of routing rule policies which will be
+#                                applied for the interface.
 #  `ipforward` -- (optional) When set to true forwarding will be enabled for
 #                            interface.  This setting will enable
 #                            net.ipv4.ip_forward, net.ipv4.conf.all.forwarding
@@ -112,6 +114,14 @@ systemd_netdevs: []
 #   - interface: "bond0"
 #     bridge: "br-dummy"
 #     mtu: 9000
+#     static_routes:
+#       - gateway: 10.0.0.1
+#         destination: 0.0.0.0/0
+#         table: 100
+#     routing_rules:
+#       - From: 192.168.0.0/24
+#         Priority: 900
+#         Table: 100
 #   - interface: "br-dummy"
 #     bridge: "br-dummy"
 #     address: "10.0.0.100"

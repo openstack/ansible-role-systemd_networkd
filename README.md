@@ -66,6 +66,12 @@ Release notes for the project can be found at:
           static_routes:
             - Gateway: "10.1.0.1"
               Destination: "10.1.0.0/24"
+            - Gateway: "192.168.0.1"
+              Table: 100
+          routing_rules:
+            - IncomingInterface: bond1
+              Priority: 900
+              Table: 100
           config_overrides:
             Network:
               ConfigureWithoutCarrier: true
