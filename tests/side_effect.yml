@@ -1,0 +1,35 @@
+---
+# Copyright 2025, Cleura AB.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Adjusting the previous setup
+  hosts: network_hosts
+  gather_facts: true
+  roles:
+    - role: "{{ playbook_dir | dirname | basename }}"
+  vars:
+    systemd_interface_cleanup: true
+    systemd_run_networkd: yes
+    systemd_netdevs:
+      - NetDev:
+          Name: dummy2
+          Kind: dummy
+      - NetDev:
+          Name: br-test
+          Kind: bridge
+    systemd_networks:
+      - interface: "dummyX"
+        bridge: "br-test"
+      - interface: "br-test"
+        address: "10.1.0.1"
+        netmask: "255.255.255.0"

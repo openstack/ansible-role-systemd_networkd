@@ -1,0 +1,65 @@
+---
+# Copyright 2025, Cleura AB.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Test networkd initial installation
+  hosts: network_hosts
+  gather_facts: true
+  tasks:
+    - name: Interface check
+      assert:
+        that:
+          - ansible_facts['dummy0']['active']
+          - ansible_facts['dummy0']['type'] == 'ether'
+          - ansible_facts['dummy0']['mtu'] == 9000
+          - ansible_facts['dummy1']['active']
+          - ansible_facts['dummy1']['type'] == 'ether'
+          - ansible_facts['dummy1']['mtu'] == 9000
+          - ansible_facts['dummy2']['active']
+          - ansible_facts['dummy2']['type'] == 'ether'
+    - name: Bond check
+      assert:
+        that:
+          - ansible_facts['bond0']['active']
+          - ansible_facts['bond0']['type'] == 'bonding'
+          - ansible_facts['bond0']['mtu'] == 9000
+    - name: Bridge check
+      assert:
+        that:
+          - ansible_facts['br_dummy']['active']
+          - ansible_facts['br_dummy']['type'] == 'bridge'
+          - ansible_facts['br_dummy']['ipv4']['address'] == '10.0.0.100'
+          - ansible_facts['br_dummy']['ipv4']['netmask'] == '255.255.255.0'
+    - name: Bridge check
+      assert:
+        that:
+          - ansible_facts['br_test']['active']
+          - ansible_facts['br_test']['type'] == 'bridge'
+          - ansible_facts['br_test']['ipv4']['address'] == '10.1.0.1'
+          - ansible_facts['br_test']['ipv4']['netmask'] == '255.255.255.0'
+    - name: Check link config overrides
+      shell: 'grep -wo "Alias" /etc/systemd/network/*br-dummy.link'
+      changed_when: false
+    - name: Check general link config
+      shell: 'grep -wo "{{ item }}" /etc/systemd/network/*.link'
+      changed_when: false
+      with_items:
+        - MACAddressPolicy
+        - NamePolicy
+    - name: Check forwarding is enabled
+      shell: 'grep -wo ^1$ /proc/sys/net/{{ item }}'
+      changed_when: false
+      with_items:
+        - "ipv4/ip_forward"
+        - "ipv4/conf/all/forwarding"
+        - "ipv4/conf/br-test2/forwarding"

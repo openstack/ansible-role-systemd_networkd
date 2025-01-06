@@ -1,0 +1,48 @@
+---
+dependency:
+  name: galaxy
+  options:
+    requirements-file: requirements.yml
+    force: true
+
+driver:
+  name: docker
+
+platforms:
+  - name: "systemd-service-${MOLECULE_SCENARIO_NAME}"
+    image: "${DOCKER_REGISTRY:-quay.io/gotmax23}/${DOCKER_IMAGE_TAG:-debian-systemd:bookworm}"
+    command: ${DOCKER_COMMAND:-""}
+    pre_build_image: true
+    privileged: true
+    systemd: true
+    groups:
+      - network_hosts
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+  playbooks:
+    prepare: ../../tests/prepare.yml
+    converge: ../../tests/test.yml
+    side_effect: ../../tests/side_effect.yml
+  config_options:
+    defaults:
+      inject_facts_as_vars: false
+
+scenario:
+  name: default
+  test_sequence:
+    - dependency
+    - cleanup
+    - destroy
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - verify ../../tests/verify.yml
+    - side_effect
+    - verify ../../tests/verify_side_effect.yml
+    - cleanup
+    - destroy

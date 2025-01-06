@@ -16,7 +16,7 @@
 - project:
     templates:
       - openstack-ansible-linters-jobs
-      - openstack-ansible-role-jobs
+      - openstack-ansible-molecule
       - openstack-ansible-deploy-aio_metal-jobs
       - openstack-ansible-deploy-aio_distro_metal-jobs
       - check-requirements
