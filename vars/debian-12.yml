@@ -1,5 +1,5 @@
 ---
-# Copyright 2018, Rackspace US, Inc.
+# Copyright 2025, Cleura AB.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_systemd_networkd_distro_packages: []
+_systemd_networkd_distro_packages:
+  - "{{ systemd_resolved_available | ternary('systemd-resolved', '') }}"
 
-_systemd_resolved_available: true
+_systemd_resolved_available: false
 
 _systemd_networkd_update_initramfs: "/usr/sbin/update-initramfs -u"

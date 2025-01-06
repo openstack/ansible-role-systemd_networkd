@@ -36,8 +36,6 @@
     name: "systemd-resolved"
     state: restarted
     enabled: "yes"
-  when:
-    - systemd_resolved_available | bool
   tags:
     - systemd-networkd
     - systemd-resolved

@@ -87,7 +87,7 @@
 
     - name: Install networkd distro packages
       package:
-        name: "{{ systemd_networkd_distro_packages }}"
+        name: "{{ systemd_networkd_distro_packages | select() }}"
         state: "present"
         update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
         cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(600, omit) }}"
@@ -114,6 +114,7 @@
     mode: "0644"
   when:
     - systemd_resolved | length > 0
+    - systemd_resolved_available | bool
   notify:
     - Restart systemd-resolved
   tags:

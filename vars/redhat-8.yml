@@ -15,6 +15,7 @@
 
 _systemd_networkd_distro_packages:
   - systemd-networkd
+  - "{{ systemd_resolved_available | ternary('systemd-resolved', '') }}"
 
 _systemd_resolved_available: false
 
