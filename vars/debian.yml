@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-_systemd_networkd_distro_packages: []
+_systemd_networkd_distro_packages:
+  - dbus  # Needed for networkctl
+  - udev  # Needed for networkd to bring interfaces up
 
 _systemd_resolved_available: true
 

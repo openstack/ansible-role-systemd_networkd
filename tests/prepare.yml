@@ -18,34 +18,19 @@
     iproute_package_name:
       redhat: iproute
       debian: iproute2
-    # NOTE: Packages below are potentially needed outside of molecule as well
     procps_package_name:
       redhat: procps-ng
       debian: procps
+    # Needed for `restorecon` command
     selinux_package_name:
       redhat: policycoreutils
       debian: ''
-    udev_package_name:
-      redhat: systemd-udev
-      debian: udev
     install_packages:
       - "{{ iproute_package_name[ansible_facts['os_family'] | lower] }}"
       - "{{ procps_package_name[ansible_facts['os_family'] | lower] }}"
       - "{{ selinux_package_name[ansible_facts['os_family'] | lower] }}"
-      - "{{ udev_package_name[ansible_facts['os_family'] | lower] }}"
-      - dbus
   tasks:
     - name: Install required packages
       ansible.builtin.package:
         name: "{{ install_packages | select() }}"
         update_cache: "{{ (ansible_facts['os_family'] | lower == 'debian') | ternary(true, omit) }}"
-
-    - name: Ensure required services are running
-      ansible.builtin.systemd:
-        name: "{{ item }}"
-        state: started
-        enabled: true
-        masked: false
-      with_items:
-        - dbus
-        - systemd-udevd

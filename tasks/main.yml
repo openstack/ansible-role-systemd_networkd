@@ -96,6 +96,8 @@
       until: install_packages is success
       retries: 3
       delay: 2
+      notify:
+        - Restart systemd-networkd
 
 - name: Create systemd-networkd directory
   file:
@@ -216,16 +218,6 @@
   loop: "{{ _systemd_networks_named | selectattr('static_routes', 'defined') }}"
   notify:
     - Restart systemd-networkd
-
-- name: Enable and start systemd-networkd
-  systemd:
-    name: "systemd-networkd"
-    enabled: "yes"
-    state: started
-  when:
-    - systemd_run_networkd | bool
-  tags:
-    - systemd-networkd
 
 - name: Restart systemd_networkd prior to applying sysctl changes
   meta: flush_handlers

@@ -13,6 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+- name: Ensure required services are running
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true
+    masked: false
+  with_items:
+    - dbus
+    - systemd-udevd
+  listen: Restart systemd-networkd
+
 - name: Restart networkd
   systemd:
     name: "systemd-networkd"
