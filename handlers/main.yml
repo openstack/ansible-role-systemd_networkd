@@ -23,6 +23,8 @@
     - dbus
     - systemd-udevd
   listen: Restart systemd-networkd
+  when:
+    - systemd_networkd_distro_packages | length > 0
 
 - name: Restart networkd
   systemd:
