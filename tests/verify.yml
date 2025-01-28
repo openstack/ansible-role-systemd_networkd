@@ -47,6 +47,20 @@
           - ansible_facts['br_test']['type'] == 'bridge'
           - ansible_facts['br_test']['ipv4']['address'] == '10.1.0.1'
           - ansible_facts['br_test']['ipv4']['netmask'] == '255.255.255.0'
+    - name: Vlan 100 check
+      assert:
+        that:
+          - ansible_facts['vlan_100']['active']
+          - ansible_facts['vlan_100']['type'] == 'ether'
+          - ansible_facts['vlan_100']['ipv4']['address'] == '10.3.0.1'
+          - ansible_facts['vlan_100']['ipv4']['netmask'] == '255.255.255.0'
+    - name: Vlan 200 check
+      assert:
+        that:
+          - ansible_facts['vlan_200']['active']
+          - ansible_facts['vlan_200']['type'] == 'ether'
+          - ansible_facts['vlan_200']['ipv4']['address'] == '10.4.0.1'
+          - ansible_facts['vlan_200']['ipv4']['netmask'] == '255.255.255.0'
     - name: Check link config overrides
       shell: 'grep -wo "Alias" /etc/systemd/network/*br-dummy.link'
       changed_when: false
