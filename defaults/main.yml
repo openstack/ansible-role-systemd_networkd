@@ -132,7 +132,14 @@ systemd_netdevs: []
 #     config_overrides:
 #       Network:
 #         ConfigureWithoutCarrier: true
-
+#   - interface: "bond1"
+#     network_overrides_only: True
+#     config_overrides:
+#       Network:
+#         VLAN:
+#           ? 100
+#           ? 200
+#     filename: 10-netplan-bond1
 systemd_networks: []
 
 # The systemd resolved service can be setup using th following configuration.

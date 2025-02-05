@@ -166,7 +166,11 @@
     mode: "0644"
     config_overrides: "{{ item.1.link_config_overrides | default(systemd_link_config_overrides) }}"
     config_type: "ini"
-  with_indexed_items: "{{ _systemd_networks_named }}"
+  with_indexed_items: >-
+    {{
+      _systemd_networks_named | rejectattr('network_overrides_only', 'defined') +
+      _systemd_networks_named | selectattr('network_overrides_only', 'defined') | selectattr('network_overrides_only', 'false')
+    }}
   notify:
     - Update initramfs
     - Restart systemd-networkd
@@ -182,7 +186,11 @@
     mode: "0644"
     config_overrides: "{{ item.1.config_overrides | default({}) }}"
     config_type: "ini"
-  with_indexed_items: "{{ _systemd_networks_named }}"
+  with_indexed_items: >-
+    {{
+      _systemd_networks_named | rejectattr('network_overrides_only', 'defined') +
+      _systemd_networks_named | selectattr('network_overrides_only', 'defined') | selectattr('network_overrides_only', 'false')
+    }}
   notify:
     - Restart systemd-networkd
   tags:
@@ -195,7 +203,28 @@
     group: "root"
     mode: "0755"
     state: directory
-  loop: "{{ _systemd_networks_named | selectattr('static_routes', 'defined') | map(attribute='filename') }}"
+  loop: >-
+    {{
+      (
+        _systemd_networks_named | selectattr('static_routes', 'defined') +
+        _systemd_networks_named | selectattr('network_overrides_only', 'defined') | selectattr('network_overrides_only', 'true')
+      ) | map(attribute='filename')
+    }}
+
+- name: Create overrides files for network_overrides_only networks
+  openstack.config_template.config_template:
+    dest: "/etc/systemd/network/{{ item.1.filename }}.network.d/overrides.conf"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    config_overrides: "{{ item.1.config_overrides | default({}) }}"
+    config_type: "ini"
+  with_indexed_items: >-
+    {{ _systemd_networks_named | selectattr('network_overrides_only', 'defined') | selectattr('network_overrides_only', 'true') }}
+  notify:
+    - Restart systemd-networkd
+  tags:
+    - systemd-networkd
 
 - name: Place systemd-networkd routing policy rules
   ansible.builtin.template:

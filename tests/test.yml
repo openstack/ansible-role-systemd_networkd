@@ -50,11 +50,24 @@
           Name: dummy2
           Kind: dummy
       - NetDev:
+          Name: dummy3
+          Kind: dummy
+      - NetDev:
           Name: br-test
           Kind: bridge
       - NetDev:
           Name: br-test2
           Kind: bridge
+      - NetDev:
+          Name: vlan-100
+          Kind: vlan
+        VLAN:
+          Id: 100
+      - NetDev:
+          Name: vlan-200
+          Kind: vlan
+        VLAN:
+          Id: 200
     systemd_networks:
       - interface: "dummy0"
         bond: "bond0"
@@ -88,6 +101,8 @@
             Alias: "dummy-bridge0"
       - interface: "dummy2"
         bridge: "br-test"
+      - interface: "dummy3"
+        bridge: "br-test2"
       - interface: "br-test"
         address: "10.1.0.1"
         netmask: "255.255.255.0"
@@ -95,3 +110,19 @@
         address: 10.2.0.1
         netmask: "255.255.255.0"
         ipforward: true
+        vlan:
+          - vlan-100
+        filename: 6-general-br-test2
+      - interface: "br-test2"
+        filename: 6-general-br-test2
+        network_overrides_only: true
+        config_overrides:
+          Network:
+            VLAN:
+              ? vlan-200
+      - interface: "vlan-100"
+        address: 10.3.0.1
+        netmask: "255.255.255.0"
+      - interface: "vlan-200"
+        address: 10.4.0.1
+        netmask: "255.255.255.0"
