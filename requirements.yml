@@ -1,8 +1,8 @@
 ---
 collections:
-- name: https://opendev.org/openstack/ansible-config_template
-  version: master
-  type: git
-- name: https://github.com/ansible-collections/ansible.utils
-  version: main
-  type: git
+  - name: https://opendev.org/openstack/ansible-config_template
+    version: master
+    type: git
+  - name: https://github.com/ansible-collections/ansible.utils
+    version: main
+    type: git

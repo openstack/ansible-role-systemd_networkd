@@ -14,8 +14,8 @@
 # limitations under the License.
 
 _systemd_networkd_distro_packages:
-  - dbus  # Needed for networkctl
-  - udev  # Needed for networkd to bring interfaces up
+  - dbus # Needed for networkctl
+  - udev # Needed for networkd to bring interfaces up
 
 _systemd_resolved_available: true
 

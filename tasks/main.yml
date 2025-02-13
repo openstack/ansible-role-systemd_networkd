@@ -25,7 +25,7 @@
         - "{{ ansible_facts['os_family'] | lower }}.yml"
       paths:
         - "{{ role_path }}/vars"
-      skip: true  # skip if no files are found
+      skip: true # skip if no files are found
   tags:
     - always
 
@@ -39,7 +39,7 @@
       copy:
         src: "{{ item.keyfile }}"
         dest: "{{ item.key }}"
-        mode: '0644'
+        mode: "0644"
       with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile', 'defined') | list }}"
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
@@ -72,12 +72,12 @@
       yum_repository:
         name: epel-networkd
         baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
-        description: 'Extra Packages for Enterprise Linux $releasever - $basearch'
+        description: "Extra Packages for Enterprise Linux $releasever - $basearch"
         gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
-        gpgcheck: yes
-        enabled: yes
+        gpgcheck: true
+        enabled: true
         state: present
-        includepkgs: 'systemd-networkd'
+        includepkgs: "systemd-networkd"
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
       register: install_epel_repo
@@ -255,9 +255,9 @@
   sysctl:
     name: "net.ipv4.conf.{{ item.1.interface }}.forwarding"
     value: 1
-    sysctl_set: yes
+    sysctl_set: true
     state: present
-    reload: yes
+    reload: true
   with_indexed_items: "{{ _systemd_networks_named }}"
   when:
     - (ansible_facts['os_family'] | lower) == 'redhat'

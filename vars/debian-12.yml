@@ -14,9 +14,9 @@
 # limitations under the License.
 
 _systemd_networkd_distro_packages:
-  - dbus  # Needed for networkctl
+  - dbus # Needed for networkctl
   - "{{ systemd_resolved_available | ternary('systemd-resolved', '') }}"
-  - udev  # Needed for networkd to bring interfaces up
+  - udev # Needed for networkd to bring interfaces up
 
 _systemd_resolved_available: false
 
