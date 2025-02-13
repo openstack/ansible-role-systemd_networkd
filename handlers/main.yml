@@ -27,7 +27,7 @@
     - systemd_networkd_distro_packages | length > 0
 
 - name: Restart networkd
-  systemd:
+  ansible.builtin.systemd:
     name: "systemd-networkd"
     state: restarted
     enabled: "yes"
@@ -40,12 +40,12 @@
     - systemd-networkd
 
 - name: (RE)Gather facts post setup
-  setup:
+  ansible.builtin.setup:
     gather_subset: "network,hardware,virtual"
   listen: Restart systemd-networkd
 
 - name: Restart systemd-resolved
-  systemd:
+  ansible.builtin.systemd:
     name: "systemd-resolved"
     state: restarted
     enabled: "yes"
@@ -54,7 +54,7 @@
     - systemd-resolved
 
 - name: Update initramfs
-  command: "{{ systemd_networkd_update_initramfs }}" # noqa: no-changed-when
+  ansible.builtin.command: "{{ systemd_networkd_update_initramfs }}" # noqa: no-changed-when
   when:
     - ansible_facts['virtualization_type'] != "systemd-nspawn"
     - ansible_facts['virtualization_type'] != "lxc"

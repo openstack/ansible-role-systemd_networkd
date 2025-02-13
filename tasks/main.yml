@@ -14,7 +14,7 @@
 # limitations under the License.
 
 - name: Gather variables for each operating system
-  include_vars: "{{ lookup('first_found', params) }}"
+  ansible.builtin.include_vars: "{{ lookup('first_found', params) }}"
   vars:
     params:
       files:
@@ -36,7 +36,7 @@
     # Copy all factored-in GPG keys.
     # KeyID 2F86D6A1 from https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
     - name: If a keyfile is provided, copy the gpg keyfile to the key location
-      copy:
+      ansible.builtin.copy:
         src: "{{ item.keyfile }}"
         dest: "{{ item.key }}"
         mode: "0644"
@@ -45,7 +45,7 @@
         - ansible_facts['os_family'] | lower == 'redhat'
 
     - name: Ensure GPG keys have the correct SELinux contexts applied
-      command: restorecon -Rv /etc/pki/rpm-gpg/
+      ansible.builtin.command: restorecon -Rv /etc/pki/rpm-gpg/
       # TODO(evrardjp): Be more idempotent
       changed_when: false
       when:
@@ -53,7 +53,7 @@
 
     # Handle gpg keys manually
     - name: Install gpg keys
-      rpm_key:
+      ansible.builtin.rpm_key:
         key: "{{ key.key }}"
         validate_certs: "{{ key.validate_certs | default(omit) }}"
         state: "{{ key.state | default('present') }}"
@@ -69,7 +69,7 @@
 
     # NOTE(jrosser) this repo is configured with the path to the first gpg key provided
     - name: Install the EPEL repository
-      yum_repository:
+      ansible.builtin.yum_repository:
         name: epel-networkd
         baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
         description: "Extra Packages for Enterprise Linux $releasever - $basearch"
@@ -86,7 +86,7 @@
       delay: 2
 
     - name: Install networkd distro packages
-      package:
+      ansible.builtin.package:
         name: "{{ systemd_networkd_distro_packages | select() }}"
         state: "present"
         update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
@@ -100,7 +100,7 @@
         - Restart systemd-networkd
 
 - name: Create systemd-networkd directory
-  file:
+  ansible.builtin.file:
     path: "/etc/systemd/network"
     state: directory
     mode: "0755"
@@ -108,7 +108,7 @@
     - systemd-networkd
 
 - name: Create systemd-resolved config
-  template:
+  ansible.builtin.template:
     src: "systemd-resolved.conf.j2"
     dest: "/etc/systemd/resolved.conf"
     owner: "root"
@@ -123,7 +123,7 @@
     - systemd-resolved
 
 - name: Find prefixed netdev and network files
-  find:
+  ansible.builtin.find:
     paths: "/etc/systemd/network"
     patterns: "*{{ systemd_networkd_prefix }}*.netdev,*{{ systemd_networkd_prefix }}*.network"
   register: networkd_files
@@ -133,7 +133,7 @@
     - systemd-networkd
 
 - name: Remove prefixed network files
-  file:
+  ansible.builtin.file:
     path: "{{ item.path }}"
     state: absent
   with_items: "{{ networkd_files.files }}"
@@ -145,7 +145,7 @@
     - systemd-networkd
 
 - name: Create systemd-networkd network device(s)
-  template:
+  ansible.builtin.template:
     src: "systemd-netdev.j2"
     dest: "/etc/systemd/network/{{ item.1.filename }}.netdev"
     owner: "root"
@@ -249,10 +249,10 @@
     - Restart systemd-networkd
 
 - name: Restart systemd_networkd prior to applying sysctl changes
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Add IP Forward for interface
-  sysctl:
+  ansible.posix.sysctl:
     name: "net.ipv4.conf.{{ item.1.interface }}.forwarding"
     value: 1
     sysctl_set: true
