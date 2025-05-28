@@ -1,5 +1,5 @@
 ---
-# Copyright 2020, VEXXHOST Inc.
+# Copyright 2025, Cleura AB.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,26 +14,48 @@
 # limitations under the License.
 
 _systemd_networkd_distro_packages:
+  - dbus # Needed for networkctl
   - systemd-networkd
   - "{{ systemd_resolved_available | ternary('systemd-resolved', '') }}"
+  - systemd-udev # Needed for networkd to bring interfaces up
 
 _systemd_resolved_available: false
 
 _systemd_networkd_update_initramfs: "dracut -f"
 
+_systemd_networkd_sig_distribution: >-
+  {{
+    (ansible_facts['distribution_release'] | lower == 'stream') | ternary(
+      , ansible_facts['distribution_major_version'])
+  }}
+
 systemd_networkd_repos:
   - name: epel-networkd
     baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
     description: "Extra Packages for Enterprise Linux $releasever - $basearch"
-    gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
+    gpgkey: "file://{{ (systemd_networkd_package_repos_keys | selectattr('name', 'eq', 'epel-10') | first).key }}"
     gpgcheck: true
     enabled: true
     state: present
-    includepkgs: "systemd-networkd"
+  - name: hyperscale-networkd
+    baseurl: >-
+      {{ systemd_networkd_sig_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '-stream/hyperscale/' ~
+          ansible_facts['architecture'] ~ '/packages-main/' }}
+    description: "Hyperscale SIG Packages for Enterprise Linux $releasever - $basearch"
+    includepkgs:
+      - systemd*
+      - libsystemd-shared
+    gpgkey: "file://{{ (systemd_networkd_package_repos_keys | selectattr('name', 'eq', 'hyperscale-sig') | first).key }}"
+    gpgcheck: true
+    enabled: true
+    state: present
 
 systemd_networkd_enablerepo: epel
 
 systemd_networkd_package_repos_keys:
-  - name: epel-8
-    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-8
-    keyfile: gpg/2F86D6A1
+  - name: epel-10
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-10
+    keyfile: gpg/E37ED158
+  - name: hyperscale-sig
+    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-HyperScale
+    keyfile: gpg/EB3DAC40

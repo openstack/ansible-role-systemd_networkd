@@ -23,6 +23,16 @@ _systemd_resolved_available: false
 
 _systemd_networkd_update_initramfs: "dracut -f"
 
+systemd_networkd_repos:
+  - name: epel-networkd
+    baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
+    description: "Extra Packages for Enterprise Linux $releasever - $basearch"
+    gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
+    gpgcheck: true
+    enabled: true
+    state: present
+    includepkgs: "systemd-networkd"
+
 systemd_networkd_enablerepo: epel
 
 systemd_networkd_package_repos_keys:

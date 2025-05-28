@@ -67,17 +67,19 @@
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
 
-    # NOTE(jrosser) this repo is configured with the path to the first gpg key provided
     - name: Install the EPEL repository
       ansible.builtin.yum_repository:
-        name: epel-networkd
-        baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
-        description: "Extra Packages for Enterprise Linux $releasever - $basearch"
-        gpgkey: "file://{{ systemd_networkd_package_repos_keys[0].key }}"
-        gpgcheck: true
-        enabled: true
-        state: present
-        includepkgs: "systemd-networkd"
+        name: "{{ item.name }}"
+        baseurl: "{{ item.baseurl }}"
+        description: "{{ item.description }}"
+        gpgkey: "{{ item.gpgkey }}"
+        gpgcheck: "{{ item.gpgcheck }}"
+        enabled: "{{ item.enabled }}"
+        state: "{{ item.state }}"
+        includepkgs: "{{ item.includepkgs | default([]) }}"
+      loop: "{{ systemd_networkd_repos | default([]) }}"
+      loop_control:
+        label: "{{ item.name }}"
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
       register: install_epel_repo
