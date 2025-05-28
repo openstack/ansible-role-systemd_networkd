@@ -29,6 +29,7 @@
       - "{{ iproute_package_name[ansible_facts['os_family'] | lower] }}"
       - "{{ procps_package_name[ansible_facts['os_family'] | lower] }}"
       - "{{ selinux_package_name[ansible_facts['os_family'] | lower] }}"
+      - gnupg2
   tasks:
     - name: Install required packages
       ansible.builtin.package:
