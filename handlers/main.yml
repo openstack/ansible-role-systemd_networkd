@@ -22,7 +22,10 @@
   with_items:
     - dbus
     - systemd-udevd
-  listen: Restart systemd-networkd
+    - systemd-udev-trigger
+  listen:
+    - Restart systemd-networkd
+    - Restart systemd-udev
   when:
     - systemd_networkd_distro_packages | length > 0
 
@@ -38,6 +41,26 @@
   listen: Restart systemd-networkd
   tags:
     - systemd-networkd
+
+# NOTE: Workaround for https://bugzilla.redhat.com/show_bug.cgi?id=2406525
+- name: Clean-up systemd-udev override for EL
+  ansible.builtin.file:
+    path: /usr/lib/systemd/system/systemd-udev-trigger.service.d/systemd-udev-trigger-no-reload.conf
+    state: absent
+  listen:
+    - Restart systemd-udev
+  register: systemd_udev_trigger_no_reload
+  when:
+    - systemd_run_networkd | bool
+    - ansible_facts['os_family'] | lower == 'redhat'
+
+- name: Restart systemd-udev
+  ansible.builtin.systemd:
+    name: systemd-udev-trigger
+    state: restarted
+    daemon_reload: "{{ systemd_udev_trigger_no_reload.changed | bool }}"
+  when:
+    - systemd_run_networkd | bool
 
 - name: (RE)Gather facts post setup
   ansible.builtin.setup:
