@@ -176,6 +176,7 @@
   notify:
     - Update initramfs
     - Restart systemd-networkd
+    - Restart systemd-udev
   tags:
     - systemd-networkd
 
