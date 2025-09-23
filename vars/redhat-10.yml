@@ -37,18 +37,8 @@ systemd_networkd_repos:
     gpgcheck: true
     enabled: true
     state: present
-  - name: hyperscale-networkd
-    baseurl: >-
-      {{ systemd_networkd_sig_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '-stream/hyperscale/' ~
-          ansible_facts['architecture'] ~ '/packages-main/' }}
-    description: "Hyperscale SIG Packages for Enterprise Linux $releasever - $basearch"
     includepkgs:
-      - systemd*
-      - libsystemd-shared
-    gpgkey: "file://{{ (systemd_networkd_package_repos_keys | selectattr('name', 'eq', 'hyperscale-sig') | first).key }}"
-    gpgcheck: true
-    enabled: true
-    state: present
+      - systemd-networkd
 
 systemd_networkd_enablerepo: epel
 
@@ -56,6 +46,3 @@ systemd_networkd_package_repos_keys:
   - name: epel-10
     key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-10
     keyfile: gpg/E37ED158
-  - name: hyperscale-sig
-    key: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-HyperScale
-    keyfile: gpg/EB3DAC40
