@@ -26,7 +26,7 @@
   when:
     - systemd_networkd_distro_packages | length > 0
 
-- name: Restart networkd
+- name: Restart systemd-networkd
   ansible.builtin.systemd:
     name: "systemd-networkd"
     state: restarted
