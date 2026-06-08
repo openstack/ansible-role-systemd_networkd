@@ -44,15 +44,21 @@
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
 
-    - name: Ensure GPG keys have the correct SELinux contexts applied
-      ansible.builtin.command: restorecon -Rv /etc/pki/rpm-gpg/
-      # TODO(evrardjp): Be more idempotent
+    - name: Check whether GPG keys require SELinux context restoration
+      ansible.builtin.command: restorecon -Rnv /etc/pki/rpm-gpg/
+      register: gpg_restorecon_check
       changed_when: false
       when:
         - ansible_facts['os_family'] | lower == 'redhat'
 
-    # Handle gpg keys manually
-    - name: Install gpg keys
+    - name: Ensure GPG keys have the correct SELinux contexts applied
+      ansible.builtin.command: restorecon -Rv /etc/pki/rpm-gpg/
+      when:
+        - ansible_facts['os_family'] | lower == 'redhat'
+        - gpg_restorecon_check.stdout | length > 0
+
+    # Handle GPG keys manually
+    - name: Install GPG keys
       ansible.builtin.rpm_key:
         key: "{{ key.key }}"
         validate_certs: "{{ key.validate_certs | default(omit) }}"
@@ -87,7 +93,7 @@
       retries: 5
       delay: 2
 
-    - name: Install networkd distro packages
+    - name: Install systemd-networkd distro packages
       ansible.builtin.package:
         name: "{{ systemd_networkd_distro_packages | select() }}"
         state: "present"
@@ -251,7 +257,7 @@
   notify:
     - Restart systemd-networkd
 
-- name: Restart systemd_networkd prior to applying sysctl changes
+- name: Restart systemd-networkd prior to applying sysctl changes
   ansible.builtin.meta: flush_handlers
 
 - name: Add IP Forward for interface
