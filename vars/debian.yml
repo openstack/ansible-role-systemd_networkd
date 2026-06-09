@@ -15,8 +15,9 @@
 
 _systemd_networkd_distro_packages:
   - dbus # Needed for networkctl
+  - "{{ systemd_resolved_available | ternary('systemd-resolved', '') }}"
   - udev # Needed for networkd to bring interfaces up
 
-_systemd_resolved_available: true
+_systemd_resolved_available: false
 
 _systemd_networkd_update_initramfs: "/usr/sbin/update-initramfs -u"
