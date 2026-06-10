@@ -60,6 +60,11 @@ VXLAN={{ item.1.vxlan }}
 {% if item.1.ipforward is defined %}
 IPForward={{ (item.1.ipforward | bool) | ternary('yes', 'no') }}
 {% endif %}
+{% if item.1.dns is defined %}
+{% for dns_server in item.1.dns %}
+DNS={{ dns_server }}
+{% endfor %}
+{% endif %}
 
 [Link]
 {% if item.1.mtu is defined and item.1.mtu %}
