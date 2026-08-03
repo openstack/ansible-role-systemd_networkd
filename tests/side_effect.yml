@@ -33,3 +33,17 @@
       - interface: "br-test"
         address: "10.1.0.1"
         netmask: "255.255.255.0"
+  post_tasks:
+    - name: Interface check
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['br_test'] is defined
+          - ansible_facts['dummy2']['active']
+          - ansible_facts['dummy2']['type'] == 'ether'
+    - name: Bridge check
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['br_test']['active']
+          - ansible_facts['br_test']['type'] == 'bridge'
+          - ansible_facts['br_test']['ipv4']['address'] == '10.1.0.1'
+          - ansible_facts['br_test']['ipv4']['netmask'] == '255.255.255.0'
