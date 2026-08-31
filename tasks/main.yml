@@ -107,6 +107,26 @@
       notify:
         - Restart systemd-networkd
 
+- name: Disable NetworkManager
+  when:
+    - ansible_facts['os_family'] | lower == 'redhat'
+    - systemd_networkd_disable_network_manager | bool
+  block:
+    - name: Gather facts about installed services
+      ansible.builtin.service_facts:
+
+    - name: Stop, disable and mask NetworkManager services
+      ansible.builtin.systemd:
+        name: "{{ nm_service }}"
+        state: stopped
+        enabled: false
+        masked: true
+      loop: "{{ systemd_networkd_network_manager_services }}"
+      loop_control:
+        loop_var: nm_service
+      when:
+        - nm_service in ansible_facts['services']
+
 - name: Create systemd-networkd directory
   ansible.builtin.file:
     path: "/etc/systemd/network"

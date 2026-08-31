@@ -27,6 +27,13 @@ systemd_networkd_prefix: "general"
 # Enable systemd-networkd and (re)start the service
 systemd_run_networkd: false
 
+systemd_networkd_disable_network_manager: "{{ systemd_run_networkd | bool }}"
+
+systemd_networkd_network_manager_services:
+  - NetworkManager.service
+  - NetworkManager-wait-online.service
+  - NetworkManager-dispatcher.service
+
 # The `systemd_link_config_overrides` option can be used on the default link.
 #  See the following link for all available options:
 #   https://www.freedesktop.org/software/systemd/man/systemd.link.html
