@@ -14,7 +14,6 @@ platforms:
     command: ${DOCKER_COMMAND:-""}
     pre_build_image: true
     privileged: true
-    systemd: true
     groups:
       - network_hosts
 
