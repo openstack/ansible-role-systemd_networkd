@@ -1,9 +1,8 @@
 ---
 features:
   - |
-    On RedHat based distributions the ``NetworkManager`` units are now stopped,
-    disabled and masked whenever the role is responsible for running
-    ``systemd-networkd``. Set ``systemd_networkd_disable_network_manager`` to
-    ``false`` to leave the previous behaviour, or override
-    ``systemd_networkd_network_manager_services`` to change which units are
-    masked.
+    On RedHat based distributions the role can now stop, disable and mask the
+    ``NetworkManager`` units. This is disabled by default. Set
+    ``systemd_networkd_disable_network_manager`` to ``true`` to enable it, or
+    override ``systemd_networkd_network_manager_services`` to change which
+    units are masked.

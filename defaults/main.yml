@@ -27,7 +27,7 @@ systemd_networkd_prefix: "general"
 # Enable systemd-networkd and (re)start the service
 systemd_run_networkd: false
 
-systemd_networkd_disable_network_manager: "{{ systemd_run_networkd | bool }}"
+systemd_networkd_disable_network_manager: false
 
 systemd_networkd_network_manager_services:
   - NetworkManager.service
