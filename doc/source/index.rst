@@ -2,8 +2,10 @@
 systemd_networkd role for OpenStack-Ansible
 ===========================================
 
-:tags: openstack, systemd_networkd, cloud, ansible
-:category: \*nix
+.. toctree::
+   :maxdepth: 2
+
+   user-guide.rst
 
 This role will configure Systemd units:
 
@@ -16,6 +18,14 @@ Default variables
 
 Example playbook
 ~~~~~~~~~~~~~~~~
+
+To get role requirements you can use use the ``ansible-galaxy`` command on the
+``requirements.yml`` file. You need to install requirements **before**
+running this role.
+
+..code-block:: bash
+
+  # ansible-galaxy install -r requirements.yml
 
 .. literalinclude:: ../../examples/playbook.yml
    :language: yaml
