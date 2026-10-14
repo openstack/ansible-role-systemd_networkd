@@ -31,7 +31,13 @@ _systemd_networkd_sig_distribution: >-
 
 systemd_networkd_repos:
   - name: epel-networkd
-    baseurl: "{{ systemd_networkd_epel_mirror ~ '/' ~ ansible_facts['distribution_major_version'] ~ '/Everything/' ~ ansible_facts['architecture'] }}"
+    baseurl: >-
+      {{
+        systemd_networkd_epel_mirror ~
+        '/' ~ ansible_facts['distribution_major_version'] ~
+        (ansible_facts['distribution'] | lower != 'centos') | ternary('z', '') ~
+        '/Everything/' ~ ansible_facts['architecture']
+      }}
     description: "Extra Packages for Enterprise Linux $releasever - $basearch"
     gpgkey: "file://{{ (systemd_networkd_package_repos_keys | selectattr('name', 'eq', 'epel-10') | first).key }}"
     gpgcheck: true
