@@ -29,7 +29,7 @@ _systemd_networkd_sig_distribution: >-
       , ansible_facts['distribution_major_version'])
   }}
 
-systemd_networkd_repos:
+_systemd_networkd_repos:
   - name: epel-networkd
     baseurl: >-
       {{
@@ -46,9 +46,7 @@ systemd_networkd_repos:
     includepkgs:
       - systemd-networkd
 
-systemd_networkd_enablerepo: epel
-
-systemd_networkd_package_repos_keys:
+_systemd_networkd_package_repos_keys:
   - name: epel-10
     key: /etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-10
-    keyfile: gpg/E37ED158
+    url: "{{ systemd_networkd_centos_epel_key }}"

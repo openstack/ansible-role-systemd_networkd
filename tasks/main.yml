@@ -32,6 +32,7 @@
 - name: Install required repos and packages
   when:
     - systemd_networkd_distro_packages | length > 0
+    - ansible_facts['os_family'] | lower == 'redhat'
   block:
     # Copy all factored-in GPG keys.
     # KeyID 2F86D6A1 from https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-8
@@ -41,21 +42,13 @@
         dest: "{{ item.key }}"
         mode: "0644"
       with_items: "{{ systemd_networkd_package_repos_keys | selectattr('keyfile', 'defined') | list }}"
-      when:
-        - ansible_facts['os_family'] | lower == 'redhat'
 
-    - name: Check whether GPG keys require SELinux context restoration
-      ansible.builtin.command: restorecon -Rnv /etc/pki/rpm-gpg/
-      register: gpg_restorecon_check
-      changed_when: false
-      when:
-        - ansible_facts['os_family'] | lower == 'redhat'
-
-    - name: Ensure GPG keys have the correct SELinux contexts applied
-      ansible.builtin.command: restorecon -Rv /etc/pki/rpm-gpg/
-      when:
-        - ansible_facts['os_family'] | lower == 'redhat'
-        - gpg_restorecon_check.stdout | length > 0
+    - name: If a url is provided, download the gpg keyfile to the key location
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.key }}"
+        mode: "0644"
+      with_items: "{{ systemd_networkd_package_repos_keys | selectattr('url', 'defined') | list }}"
 
     # Handle GPG keys manually
     - name: Install GPG keys
@@ -70,8 +63,6 @@
       until: _add_yum_keys  is success
       retries: 5
       delay: 2
-      when:
-        - ansible_facts['os_family'] | lower == 'redhat'
 
     - name: Install the EPEL repository
       ansible.builtin.yum_repository:
@@ -86,26 +77,25 @@
       loop: "{{ systemd_networkd_repos | default([]) }}"
       loop_control:
         label: "{{ item.name }}"
-      when:
-        - ansible_facts['os_family'] | lower == 'redhat'
       register: install_epel_repo
       until: install_epel_repo  is success
       retries: 5
       delay: 2
 
-    - name: Install systemd-networkd distro packages
-      ansible.builtin.package:
-        name: "{{ systemd_networkd_distro_packages | select() }}"
-        state: "present"
-        update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
-        cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(600, omit) }}"
-        enablerepo: "{{ systemd_networkd_enablerepo | default(omit) }}"
-      register: install_packages
-      until: install_packages is success
-      retries: 3
-      delay: 2
-      notify:
-        - Restart systemd-networkd
+- name: Install systemd-networkd distro packages
+  ansible.builtin.package:
+    name: "{{ systemd_networkd_distro_packages | select() }}"
+    state: "present"
+    update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary('yes', omit) }}"
+    cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(600, omit) }}"
+  register: install_packages
+  when:
+    - systemd_networkd_distro_packages | length > 0
+  until: install_packages is success
+  retries: 3
+  delay: 2
+  notify:
+    - Restart systemd-networkd
 
 - name: Disable NetworkManager
   when:

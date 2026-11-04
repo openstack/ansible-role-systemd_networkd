@@ -182,7 +182,12 @@ systemd_networkd_update_initramfs: "{{ _systemd_networkd_update_initramfs | defa
 
 systemd_networkd_distro_packages: "{{ _systemd_networkd_distro_packages | default([]) }}"
 
+systemd_networkd_repos: "{{ _systemd_networkd_repos }}"
+systemd_networkd_package_repos_keys: "{{ _systemd_networkd_package_repos_keys }}"
+
 systemd_networkd_epel_mirror: "{{ centos_epel_mirror | default('http://dl.fedoraproject.org/pub/epel') }}"
+systemd_networkd_centos_epel_key: >-
+  {{ centos_epel_key | default('https://dl.fedoraproject.org/pub/epel/RPM-GPG-KEY-EPEL-' ~ ansible_facts['distribution_major_version']) }}
 
 # The systemd networkd service can be used to set specific link configuration options.
 # For more information on all of the possible configuration see
